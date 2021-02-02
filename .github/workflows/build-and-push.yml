@@ -1,0 +1,44 @@
+name: Build and push Exastro IT Automation container image
+on:
+  workflow_dispatch:
+    inputs:
+      EXASTRO_ITA_VER:
+        description: 'Version number of Exastro IT Automation'
+        required: false
+        default: '1.6.1'
+        
+      EXASTRO_ITA_LANG:
+        description: 'Language of Exastro IT Automation'
+        required: false
+        default: 'ja'
+        
+      EXASTRO_ITA_BASE_IMAGE:
+        description: 'Base image of Exastro IT Automation'
+        required: false
+        default: 'ubi8'
+
+jobs:
+  build_and_push_image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Environment variables
+        run: |
+          echo "EXASTRO_ITA_VER=${{ github.event.inputs.EXASTRO_ITA_VER }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_LANG=${{ github.event.inputs.EXASTRO_ITA_LANG }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_BASE_IMAGE=${{ github.event.inputs.EXASTRO_ITA_BASE_IMAGE }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/it-automation:${{ github.event.inputs.EXASTRO_ITA_VER }}-${{ github.event.inputs.EXASTRO_ITA_BASE_IMAGE }}-${{ github.event.inputs.EXASTRO_ITA_LANG }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_BUILD_DIR=${{ github.event.inputs.EXASTRO_ITA_VER }}/${{ github.event.inputs.EXASTRO_ITA_BASE_IMAGE }}" >> $GITHUB_ENV
+        
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          cd $EXASTRO_ITA_BUILD_DIR
+          ./build.sh
+
+      - name: Push
+        run: |
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
+          docker push "$EXASTRO_ITA_IMAGE_NAME"
