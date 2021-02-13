@@ -22,11 +22,53 @@ declare -A EXASTRO_ITA_LANG_TABLE=(
     ["ja"]="ja_JP"
 )
 
+declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
+    ["en"]="C.utf-8"
+    ["ja"]="ja_JP.UTF-8"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
+    ["en"]="UTC"
+    ["ja"]="Asia/Tokyo"
+)
+
+
+##############################################################################
+# Set system locale and system timezone
+
+dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# install common packages (installer requirements)
+
+dnf install -y openssl
+
+
+##############################################################################
+# install ainsible related packages
+
+# WORKAROUND: Exastro IT Automation issue #734 (https://github.com/exastro-suite/it-automation/issues/734)
+dnf -y install python3-pip
+pip3 install --upgrade pip
+
 
 ##############################################################################
 # Download Exastro IT Automation Installer
 
 curl -SL https://github.com/exastro-suite/it-automation/releases/download/v${EXASTRO_ITA_VER}/exastro-it-automation-${EXASTRO_ITA_VER}.tar.gz | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+
+
+##############################################################################
+# modify scripts (bin/ita_builder_core.sh)
+
+# WORKAROUND: Exastro IT Automation issue #735 (https://github.com/exastro-suite/it-automation/issues/735)
+sed -i \
+    -E 's/--format=legacy/--format=columns/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
 
 ##############################################################################

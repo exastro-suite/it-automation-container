@@ -22,6 +22,93 @@ declare -A EXASTRO_ITA_LANG_TABLE=(
     ["ja"]="ja_JP"
 )
 
+declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
+    ["en"]="C.utf-8"
+    ["ja"]="ja_JP.UTF-8"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
+    ["en"]="UTC"
+    ["ja"]="Asia/Tokyo"
+)
+
+
+##############################################################################
+# DNF repository
+
+cat << 'EOS' > /etc/yum.repos.d/centos8.repo
+[baseos]
+name=CentOS Linux $releasever - BaseOS
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=BaseOS&infra=$infra
+#baseurl=http://mirror.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/
+gpgcheck=0
+enabled=0
+
+[appstream]
+name=CentOS Linux $releasever - AppStream
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=AppStream&infra=$infra
+#baseurl=http://mirror.centos.org/$contentdir/$releasever/AppStream/$basearch/os/
+gpgcheck=0
+enabled=0
+EOS
+
+
+##############################################################################
+# dnf and repository configuration
+
+dnf install -y dnf-plugins-core
+dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+dnf config-manager --disable epel epel-modular
+
+
+##############################################################################
+# Set system locale and system timezone
+
+dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# install common packages (installer requirements)
+
+dnf install -y diffutils procps openssl
+dnf install -y --enablerepo=baseos expect
+
+
+##############################################################################
+# install web related packages
+
+dnf install -y hostname # apache ssl needs hostname command
+dnf install -y --enablerepo=appstream telnet
+
+
+##############################################################################
+# install ainsible related packages
+
+dnf install -y --enablerepo=epel sshpass
+
+# WORKAROUND: Exastro IT Automation issue #734 (https://github.com/exastro-suite/it-automation/issues/734)
+dnf -y install python3-pip
+pip3 install --upgrade pip
+
+
+##############################################################################
+# install MariaDB
+#   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
+
+curl -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+chmod +x mariadb_repo_setup
+./mariadb_repo_setup
+
+dnf install -y perl-DBI libaio libsepol lsof
+dnf install -y rsync iproute # additional installation
+dnf install -y --enablerepo=appstream boost-program-options
+dnf install -y --repo=mariadb-main MariaDB-server
+systemctl enable mariadb
+systemctl start mariadb
+
 
 ##############################################################################
 # Download Exastro IT Automation Installer
@@ -43,6 +130,11 @@ sed -i \
 # skip MariaDB installation (fall through to "already exists")
 sed -i \
     -E 's/^( +)(yum list installed mariadb-server .*)$/\1echo "----- FALL THROUGH TO \"ALREADY EXISTS\" -----"/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
+# WORKAROUND: Exastro IT Automation issue #735 (https://github.com/exastro-suite/it-automation/issues/735)
+sed -i \
+    -E 's/--format=legacy/--format=columns/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
 
@@ -69,67 +161,3 @@ ita_domain:exastro-it-automation.local
 certificate_path:
 private_key_path:
 EOS
-
-
-##############################################################################
-# DNF repository
-
-cat << 'EOS' > /etc/yum.repos.d/centos8.repo
-[centos8-BaseOS]
-name=CentOS-$releasever - Base
-#baseurl=http://mirror.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/
-baseurl=http://ftp.riken.jp/Linux/centos/$releasever/BaseOS/$basearch/os/
-gpgcheck=0
-enabled=0
-
-[centos8-AppStream]
-name=CentOS-$releasever - AppStream
-#baseurl=http://mirror.centos.org/$contentdir/$releasever/AppStream/$basearch/os/
-baseurl=http://ftp.riken.jp/Linux/centos/$releasever/AppStream/$basearch/os/
-gpgcheck=0
-enabled=0
-EOS
-
-
-##############################################################################
-# dnf and repository configuration
-
-dnf install -y dnf-plugins-core
-dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-dnf config-manager --disable epel epel-modular
-
-
-##############################################################################
-# install common packages
-
-dnf install -y diffutils procps # installer needs diff and ps
-dnf install -y --enablerepo=centos8-BaseOS expect
-
-
-##############################################################################
-# install web related packages
-
-dnf install -y hostname # apache ssl needs hostname command
-dnf install -y --enablerepo=centos8-AppStream telnet
-
-
-##############################################################################
-# install ainsible related packages
-
-dnf install -y --enablerepo=epel sshpass
-
-
-##############################################################################
-# install MariaDB
-#   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
-
-curl -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
-chmod +x mariadb_repo_setup
-./mariadb_repo_setup
-
-dnf install -y perl-DBI libaio libsepol lsof
-dnf install -y rsync iproute # additional installation
-dnf install -y --enablerepo="centos8-AppStream" boost-program-options
-dnf install -y --repo="mariadb-main" MariaDB-server
-systemctl enable mariadb
-systemctl start mariadb
