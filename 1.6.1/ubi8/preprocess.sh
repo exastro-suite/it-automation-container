@@ -118,6 +118,7 @@ curl -SL https://github.com/exastro-suite/it-automation/releases/download/v${EXA
 
 ##############################################################################
 # modify scripts (bin/ita_builder_core.sh)
+#   for DNF repository check
 
 sed -i \
     -E 's/ (create_repo_check .+) >>/ echo "----- SKIP \1 -----" >>/' \
@@ -127,12 +128,66 @@ sed -i \
     -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
-# skip MariaDB installation (fall through to "already exists")
+
+##############################################################################
+# modify scripts (bin/ita_builder_core.sh)
+#   for MariaDB
+
+# ORIGINAL:
+#     if [ RHEL7 or CentOS7 ]
+#         if [ already installed ]
+#             // skip install official MariaDB, then configure (** EXPECT COMMAND MAY NOT WORK !! **)
+#         else
+#             // install official MariaDB, then configure
+#    
+#     if [ RHEL8 or CentOS8 ]
+#         if [ already installed ]
+#             // skip install distro's MariaDB, then configure
+#         else
+#             // installdistro's MariaDB, then configure
+#
+#              |
+#              |
+#              V
+#
+# MODIFIED:
+#     if [ true ]
+#         if [ false ]
+#             // DON'T CARE
+#         else
+#             // COME HERE !!!
+#    
+#     if [ false ]
+#         // DON'T CARE
+
+
+# fall in configuring official MariaDB
 sed -i \
-    -E 's/^( +)(yum list installed mariadb-server .*)$/\1echo "----- FALL THROUGH TO \"ALREADY EXISTS\" -----"/' \
+    -E 's/\[ "\$LINUX_OS" == "RHEL7" -o "\$LINUX_OS" == "CentOS7" \]/"true"/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
-# WORKAROUND: Exastro IT Automation issue #735 (https://github.com/exastro-suite/it-automation/issues/735)
+# skip configuring distribution's MariaDB
+# note: This will also rewrite the condition for "local installation". But actually
+#       no impact on container building because remote installation is always executed.
+sed -i \
+    -E 's/\[ "\$LINUX_OS" == "RHEL8" -o "\$LINUX_OS" == "CentOS8" \]/"false"/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
+# fall through to MariaDB installation (by installation check failure)
+sed -i \
+    -E 's/yum list installed mariadb-server/yum list installed XXXXXXXXXXXXXX/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
+# skip configuring DNF repository of MariaDB (already configured in this script).
+sed -i \
+    -E 's/mariadb_repository /#mariadb_repository /' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
+
+##############################################################################
+# modify scripts (bin/ita_builder_core.sh)
+#   for WORKAROUND
+#   see Exastro IT Automation issue #735 (https://github.com/exastro-suite/it-automation/issues/735)
 sed -i \
     -E 's/--format=legacy/--format=columns/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
