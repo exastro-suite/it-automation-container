@@ -1,11 +1,11 @@
-name: Build and push Exastro IT Automation container image
+name: Build and push
 on:
   workflow_dispatch:
     inputs:
       EXASTRO_ITA_VER:
         description: 'Version number of Exastro IT Automation'
         required: false
-        default: '1.6.1'
+        default: '1.6.2'
         
       EXASTRO_ITA_LANG:
         description: 'Language of Exastro IT Automation'
