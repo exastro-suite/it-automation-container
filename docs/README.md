@@ -52,12 +52,12 @@ it-automation-container
 
 ビルドのシーケンスを以下の図で示す。`build.sh`がdockerを実行して一時的なコンテナイメージとコンテナを作成し、`preprocess.sh`と`ita_installer.sh`を実行して最終的なコンテナイメージを作成する。
 
-![build-sequence](diagrams/build-sequence.png)
+![build-sequence](pics/build-sequence.png)
 
 ここで、図中の`(launcher)`はスクリプト`build.sh`を実行するものであるが、GitHub Actionsを利用する場合はワークフローに、ローカル環境の場合は後続で説明するスクリプト`local-build.sh`になる。
 
 次に、以下にローカルの環境でビルドする場合のヘルパースクリプトを示す。
-これらのスクリプトは主に打鍵を減らして開発を効率化することが目的なので、必ずしも存在する必要はない。
+これらのスクリプトは主にコンソールでのタイプ数を減らして開発を効率化することが目的なので、必ずしも存在する必要はない。
 
 | スクリプト       | 説明 |
 | ---------------- | ---- |
@@ -68,7 +68,21 @@ it-automation-container
 
 ## 自動ビルド
 
-TODO
+GitHub Actionsを利用して、コンテナイメージのビルドと、GitHub Container Registryへのプッシュを自動化する。
+以下のスクリーンショットで示すように画面を操作することで自動ビルドすることができる。
+ただし、GitHub Actionsへのアクセスはコントリビュータに限定している。
+
+![build-sequence](pics/build-and-push.png)
+
+GitHub Actionsで利用するワークフローは、以下の場所にある。
+
+```
+it-automation-container
+`-- .github
+    `-- workflows
+        `-- build-and-push.yml
+```
+
 
 ## DockerHubとタグ名
 
