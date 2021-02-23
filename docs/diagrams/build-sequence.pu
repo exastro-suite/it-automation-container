@@ -1,0 +1,23 @@
+@startuml build-sequence
+
+skinparam style strictuml
+
+"(launcher)" -> "(launcher)": set env variables
+"(launcher)" -> build.sh: build.sh
+build.sh --> docker: docker build
+create "temporary image"
+docker --> "temporary image": create and tag
+build.sh --> docker: docker run
+create "temporary container"
+docker --> "temporary container": run
+build.sh --> docker: docker exec
+docker --> "temporary container": execute preprocess.sh
+build.sh --> docker: docker exec
+docker --> "temporary container": execute ita_installer.sh
+build.sh --> docker: docker stop
+docker --> "temporary container": stop
+build.sh --> docker: docker commit
+create "container image"
+docker --> "container image": create and tag
+
+@enduml
