@@ -201,10 +201,10 @@ install_mode:Install_Online
 ita_directory:/exastro
 ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
 linux_os:RHEL8
-db_root_password:db_root_password
-db_name:db_name
-db_username:db_username
-db_password:db_password
+db_root_password:ita_root_password
+db_name:ita_db
+db_username:ita_db_user
+db_password:ita_db_password
 ita_base:yes
 material:no
 createparam:yes
