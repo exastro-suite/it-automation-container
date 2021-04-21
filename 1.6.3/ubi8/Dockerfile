@@ -8,6 +8,9 @@ LABEL name="Exastro IT Automation" \
       summary="Exastro IT Automation container." \
       description="This container provides Exastro IT Automation service."
 
+# systemd must be executed by root
+USER root
+
 # Required Licenses
 COPY licenses/ /licenses/
 
