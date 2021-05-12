@@ -34,6 +34,19 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 
 
 ##############################################################################
+# Update all installed packages
+
+dnf update -y
+
+
+##############################################################################
+# dnf and repository configuration
+
+dnf install -y dnf-plugins-core
+dnf config-manager --enable powertools
+
+
+##############################################################################
 # Set system locale and system timezone
 
 dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
@@ -45,8 +58,13 @@ timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]
 ##############################################################################
 # install common packages (installer requirements)
 
-dnf install -y openssl
+dnf install -y diffutils procps openssl
 
+
+##############################################################################
+# install web related packages
+
+dnf install -y hostname # apache ssl needs hostname command
 
 ##############################################################################
 # Download Exastro IT Automation Installer
@@ -77,22 +95,3 @@ ita_domain:exastro-it-automation.local
 certificate_path:
 private_key_path:
 EOS
-
-
-##############################################################################
-# dnf and repository configuration
-
-dnf install -y dnf-plugins-core
-dnf config-manager --enable powertools
-
-
-##############################################################################
-# install common packages
-
-dnf install -y diffutils procps # installer needs diff and ps
-
-
-##############################################################################
-# install web related packages
-
-dnf install -y hostname # apache ssl needs hostname command

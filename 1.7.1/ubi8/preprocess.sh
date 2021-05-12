@@ -34,6 +34,12 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 
 
 ##############################################################################
+# Update all installed packages
+
+dnf update -y
+
+
+##############################################################################
 # DNF repository
 
 cat << 'EOS' > /etc/yum.repos.d/centos8.repo
@@ -113,6 +119,31 @@ curl -SL https://github.com/exastro-suite/it-automation/releases/download/v${EXA
 
 
 ##############################################################################
+# Create ita_answers.txt
+
+cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
+install_mode:Install_Online
+ita_directory:/exastro
+ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
+linux_os:RHEL8
+db_root_password:ita_root_password
+db_name:ita_db
+db_username:ita_db_user
+db_password:ita_db_password
+ita_base:yes
+material:no
+createparam:yes
+hostgroup:yes
+ansible_driver:yes
+cobbler_driver:no
+terraform_driver:yes
+ita_domain:exastro-it-automation.local
+certificate_path:
+private_key_path:
+EOS
+
+
+##############################################################################
 # modify scripts (bin/ita_builder_core.sh)
 #   for DNF repository check
 
@@ -179,27 +210,3 @@ sed -i \
     -E 's/mariadb_repository /#mariadb_repository /' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
-
-##############################################################################
-# Create ita_answers.txt
-
-cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
-install_mode:Install_Online
-ita_directory:/exastro
-ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:RHEL8
-db_root_password:ita_root_password
-db_name:ita_db
-db_username:ita_db_user
-db_password:ita_db_password
-ita_base:yes
-material:no
-createparam:yes
-hostgroup:yes
-ansible_driver:yes
-cobbler_driver:no
-terraform_driver:yes
-ita_domain:exastro-it-automation.local
-certificate_path:
-private_key_path:
-EOS
