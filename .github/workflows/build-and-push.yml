@@ -24,10 +24,8 @@ jobs:
     steps:
       - name: Environment variables
         run: |
-          echo "EXASTRO_ITA_VER=${{ github.event.inputs.EXASTRO_ITA_VER }}" >> $GITHUB_ENV
           echo "EXASTRO_ITA_LANG=${{ github.event.inputs.EXASTRO_ITA_LANG }}" >> $GITHUB_ENV
-          echo "EXASTRO_ITA_BASE_IMAGE=${{ github.event.inputs.EXASTRO_ITA_BASE_IMAGE }}" >> $GITHUB_ENV
-          echo "EXASTRO_ITA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/it-automation:${{ github.event.inputs.EXASTRO_ITA_VER }}-${{ github.event.inputs.EXASTRO_ITA_BASE_IMAGE }}-${{ github.event.inputs.EXASTRO_ITA_LANG }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_IMAGE_HOST_AND_PATH=ghcr.io/${{ github.repository_owner }}/" >> $GITHUB_ENV
           echo "EXASTRO_ITA_BUILD_DIR=${{ github.event.inputs.EXASTRO_ITA_VER }}/${{ github.event.inputs.EXASTRO_ITA_BASE_IMAGE }}" >> $GITHUB_ENV
         
       - name: Checkout repository
@@ -41,4 +39,4 @@ jobs:
       - name: Push
         run: |
           echo "${{ secrets.GHCR_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
-          docker push "$EXASTRO_ITA_IMAGE_NAME"
+          ./push.sh

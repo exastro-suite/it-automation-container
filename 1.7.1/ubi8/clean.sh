@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
 ##############################################################################
-# Constants
+# Load variables
 
-EXASTRO_ITA_CONTAINER_NAME=it-automation-build
+source $(cd $(dirname $0); pwd)/vars.sh
 
 
 ##############################################################################

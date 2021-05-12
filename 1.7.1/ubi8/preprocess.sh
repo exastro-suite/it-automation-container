@@ -3,7 +3,7 @@
 ##############################################################################
 # Check required environment variables
 
-for VAR in EXASTRO_ITA_VER EXASTRO_ITA_BASE_IMAGE EXASTRO_ITA_LANG; do
+for VAR in EXASTRO_ITA_VER EXASTRO_ITA_LANG; do
     if [ ! -v $VAR ]; then
         echo "Required environment variable $VAR is not defined."
         exit 1
