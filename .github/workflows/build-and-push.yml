@@ -38,5 +38,7 @@ jobs:
 
       - name: Push
         run: |
+          pwd
+          cd $EXASTRO_ITA_BUILD_DIR
           echo "${{ secrets.GHCR_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
           ./push.sh
