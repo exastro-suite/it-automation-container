@@ -5,7 +5,7 @@ on:
       EXASTRO_ITA_VER:
         description: 'Version number of Exastro IT Automation'
         required: false
-        default: '1.6.2'
+        default: '1.7.1'
         
       EXASTRO_ITA_LANG:
         description: 'Language of Exastro IT Automation'
