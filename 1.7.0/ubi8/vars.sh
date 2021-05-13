@@ -1,0 +1,6 @@
+export EXASTRO_ITA_VER=$(basename $(dirname $(cd $(dirname $0); pwd)))
+export EXASTRO_ITA_LANG=${EXASTRO_ITA_LANG:-ja}
+export EXASTRO_ITA_BASE_IMAGE_SYMBOL=$(basename $(cd $(dirname $0); pwd))
+export EXASTRO_ITA_IMAGE_HOST_AND_PATH=${EXASTRO_ITA_IMAGE_HOST_AND_PATH:-""}
+export EXASTRO_ITA_IMAGE_NAME=${EXASTRO_ITA_IMAGE_HOST_AND_PATH}it-automation:${EXASTRO_ITA_VER}-${EXASTRO_ITA_BASE_IMAGE_SYMBOL}-${EXASTRO_ITA_LANG}
+export EXASTRO_ITA_CONTAINER_NAME=it-automation-build

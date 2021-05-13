@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -xe
 
 ##############################################################################
 # Load variables
@@ -7,7 +7,6 @@ source $(cd $(dirname $0); pwd)/vars.sh
 
 
 ##############################################################################
-# Clean
+# Push container image
 
-docker stop ${EXASTRO_ITA_CONTAINER_NAME}
-docker rm ${EXASTRO_ITA_CONTAINER_NAME}
+docker push "$EXASTRO_ITA_IMAGE_NAME"
