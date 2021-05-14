@@ -96,3 +96,10 @@ dnf install -y diffutils procps # installer needs diff and ps
 # install web related packages
 
 dnf install -y hostname # apache ssl needs hostname command
+
+
+##############################################################################
+# Python interpreter warning issue (container only)
+#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
+
+find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto/'
