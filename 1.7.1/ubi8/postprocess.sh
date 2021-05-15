@@ -3,8 +3,8 @@
 ##############################################################################
 # Move, link and archive persistent directories
 
-# file storage content path
-declare -a EXASTRO_FILE_STORAGE_CONTENT_PATHS=(
+# file volume content path
+declare -a EXASTRO_FILE_VOLUME_CONTENT_PATHS=(
     "data_relay_storage/symphony"
     "data_relay_storage/conductor"
     "data_relay_storage/ansible_driver"
@@ -19,59 +19,50 @@ declare -a EXASTRO_FILE_STORAGE_CONTENT_PATHS=(
 )
 
 
-# database storage content path
-declare -a EXASTRO_DATABASE_STORAGE_CONTENT_PATHS=(
+# database volume content path
+declare -a EXASTRO_DATABASE_VOLUME_CONTENT_PATHS=(
     "mysql"
 )
 
 
 # move, link and archive
 move_and_link_and_archive() {
-    local src_dir=$1
-    shift
-
-    local dst_dir=$1
-    shift
-
-    local relative_paths=($@)
+    local SRC_BASE_DIR="$1"; shift
+    local VOLUME_PATH="$1"; shift
+    local RELATIVE_PATHS=($@)
     
-    for relative_path in ${relative_paths[@]}; do
-        move_src_path=${src_dir}/${relative_path}
-        move_dst_path=`dirname ${dst_dir}/${relative_path}`
+    for RELATIVE_PATH in ${RELATIVE_PATHS[@]}; do
+        local MOVE_SRC_PATH=${SRC_BASE_DIR}/${RELATIVE_PATH}
+        local MOVE_DST_PATH=`dirname ${VOLUME_PATH}/${RELATIVE_PATH}`
 
-        echo "move \"$move_src_path\" to \"$move_dst_path\""
-        # Alternative to mkdir
-        install --directory --mode=777 $move_dst_path
-        mv ${move_src_path} ${move_dst_path}
+        echo "move \"${MOVE_SRC_PATH}\" to \"${MOVE_DST_PATH}\""
+        install --directory --mode=777 ${MOVE_DST_PATH}   # Alternative to mkdir
+        mv ${MOVE_SRC_PATH} ${MOVE_DST_PATH}
 
-        ln_src_path=${dst_dir}/${relative_path}
-        ln_dst_path=${src_dir}/${relative_path}
+        local LN_SRC_PATH=${VOLUME_PATH}/${RELATIVE_PATH}
+        local LN_DST_PATH=${SRC_BASE_DIR}/${RELATIVE_PATH}
 
-        echo "create symbolic link from \"$ln_src_path\" to \"$ln_dst_path\""
-        ln -s ${ln_src_path} ${ln_dst_path}
+        echo "create symbolic link from \"${LN_SRC_PATH}\" to \"${LN_DST_PATH}\""
+        ln -s ${LN_SRC_PATH} ${LN_DST_PATH}
     done
 
-    marker_filep_path=${dst_dir}/.initialized
+    local MARKER_FILE_PATH=${VOLUME_PATH}/.initialized
 
-    echo "create marker file \"$marker_filep_path\""
-    touch ${marker_filep_path}
+    echo "create marker file \"${MARKER_FILE_PATH}\""
+    touch ${MARKER_FILE_PATH}
 
-    tar_gz_file_path="/root/`basename $dst_dir`.tar.gz"
+    local ARCHIVE_FILE_PATH="/exastro-initial-volume-archive/`basename ${VOLUME_PATH}`.tar.gz"
 
-    echo "create archive file \"$tar_gz_file_path\""
-    tar zcvf ${tar_gz_file_path} -C ${dst_dir} ./
+    echo "create archive file \"${ARCHIVE_FILE_PATH}\""
+    install --directory --mode=755 `dirname ${ARCHIVE_FILE_PATH}`   # Alternative to mkdir
+    tar zcvf ${ARCHIVE_FILE_PATH} -C ${VOLUME_PATH} ./
 }
+
 
 # stop services
 systemctl stop httpd
 systemctl stop mariadb
 
 # move, link and archive
-move_and_link_and_archive "/exastro" "/exastro_file_storage" "${EXASTRO_FILE_STORAGE_CONTENT_PATHS[@]}"
-move_and_link_and_archive "/var/lib" "/exastro_database_storage" "${EXASTRO_DATABASE_STORAGE_CONTENT_PATHS[@]}"
-
-rm -rf /exastro_file_storage
-install --directory --mode=777 /exastro_file_storage
-
-rm -rf /exastro_database_storage
-install --directory --mode=777 /exastro_database_storage
+move_and_link_and_archive "/exastro" "/exastro-file-volume" "${EXASTRO_FILE_VOLUME_CONTENT_PATHS[@]}"
+move_and_link_and_archive "/var/lib" "/exastro-database-volume" "${EXASTRO_DATABASE_VOLUME_CONTENT_PATHS[@]}"
