@@ -16,7 +16,7 @@ initialize_volume() {
             install --directory --mode=777 ${VOLUME_PATH}   # Alternative to mkdir
             tar zxvf ${ARCHIVE_FILE_PATH} -C ${VOLUME_PATH}
 
-            if [ $? -eq 0]; then
+            if [ $? -eq 0 ]; then
                 echo "Volume initialization succeeded.  (type=${VOLUME_TYPE})"
                 touch ${MARKER_FILE_PATH}
             else
