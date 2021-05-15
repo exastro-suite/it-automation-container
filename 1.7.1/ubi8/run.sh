@@ -19,8 +19,8 @@ if [ "$1" = "-v" ]; then
     DATABASE_VOLUME_HOST_PATH=$BASE_DIR/tmp/exastro-database-volume
     mkdir -p -m 777 ${DATABASE_VOLUME_HOST_PATH}
 
-    FILE_VOLUME_OPTION="--volume ${FILE_VOLUME_HOST_PATH}:/exastro-file-volume" # --env EXASTRO_AUTO_FILE_VOLUME_INIT=true"
-    DATABASE_VOLUME_OPTION="--volume ${DATABASE_VOLUME_HOST_PATH}:/exastro-database-volume" # --env EXASTRO_AUTO_DATABASE_VOLUME_INIT=true"
+    FILE_VOLUME_OPTION="--volume ${FILE_VOLUME_HOST_PATH}:/exastro-file-volume" --env EXASTRO_AUTO_FILE_VOLUME_INIT=true"
+    DATABASE_VOLUME_OPTION="--volume ${DATABASE_VOLUME_HOST_PATH}:/exastro-database-volume" --env EXASTRO_AUTO_DATABASE_VOLUME_INIT=true"
 fi
 
 docker run \
