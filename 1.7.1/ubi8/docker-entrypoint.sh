@@ -39,9 +39,9 @@ initialize_volume() {
 echo "entry point parameters ... $@"
 
 # Create datasource string and credential
-rot13_encode "mysql:host=${ITA_DB_HOST:-localhost};port=${ITA_DB_PORT:-3306};dbname=${ITA_DB_NAME:-ita_db}" /exastro/ita-root/confs/commonconfs/db_connection_string.txt
-rot13_encode "${ITA_DB_USER:-ita_db_user}" /exastro/ita-root/confs/commonconfs/db_username.txt
-rot13_encode "${ITA_DB_PASSWORD:-ita_db_password}" /exastro/ita-root/confs/commonconfs/db_password.txt
+rot13_encode "mysql:host=${EXASTRO_ITA_DB_HOST:-localhost};port=${EXASTRO_ITA_DB_PORT:-3306};dbname=${EXASTRO_ITA_DB_NAME:-ita_db}" /exastro/ita-root/confs/commonconfs/db_connection_string.txt
+rot13_encode "${EXASTRO_ITA_DB_USER:-ita_db_user}" /exastro/ita-root/confs/commonconfs/db_username.txt
+rot13_encode "${EXASTRO_ITA_DB_PASSWORD:-ita_db_password}" /exastro/ita-root/confs/commonconfs/db_password.txt
 
 # Initialize file volume
 if [ ${EXASTRO_AUTO_FILE_VOLUME_INIT:-false} = "true" ]; then
