@@ -1,0 +1,48 @@
+name: Build and push - ver.3.0.0
+on:
+  workflow_dispatch:
+    inputs:
+      EXASTRO_ITA_VER:
+        description: 'Version number of Exastro IT Automation'
+        required: false
+        default: '1.7.1'
+        
+      EXASTRO_ITA_LANG:
+        description: 'Language of Exastro IT Automation'
+        required: false
+        default: 'ja'
+      
+      IMAGE_NAME:
+        description: 'Image name'
+        required: false
+        default: 'it-automation'
+
+      DISTRO_SYMBOL:
+        description: 'Distro symbol of base image'
+        required: false
+        default: 'ubi8'
+
+jobs:
+  build_and_push_image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Environment variables
+        run: |
+          echo "EXASTRO_ITA_LANG=${{ github.event.inputs.EXASTRO_ITA_LANG }}" >> $GITHUB_ENV
+          echo "IMAGE_HOST_AND_PATH=ghcr.io/${{ github.repository_owner }}/" >> $GITHUB_ENV
+          echo "BUILD_TARGET_DIR=${{ github.event.inputs.EXASTRO_ITA_VER }}/${{ github.event.inputs.IMAGE_NAME }}/${{ github.event.inputs.DISTRO_SYMBOL }}" >> $GITHUB_ENV
+        
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          cd $BUILD_TARGET_DIR
+          ./build.sh
+
+      - name: Push
+        run: |
+          cd $BUILD_TARGET_DIR
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
+          ./push.sh
