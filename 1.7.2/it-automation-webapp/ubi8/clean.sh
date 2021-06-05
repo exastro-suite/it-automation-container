@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 ##############################################################################
 # Load constants
@@ -8,15 +8,7 @@ source $BASE_DIR/constants.sh
 
 
 ##############################################################################
-# Run container
+# Clean
 
-$BASE_DIR/stop-and-delete.sh
-
-docker run \
-    --name test-ita \
-    --privileged \
-    --add-host=exastro-it-automation:127.0.0.1 \
-    -d \
-    -p 8080:80 \
-    -p 10443:443 \
-    ${IMAGE_FULL_NAME}
+docker stop ${BUILDER_CONTAINER_NAME}
+docker rm ${BUILDER_CONTAINER_NAME}

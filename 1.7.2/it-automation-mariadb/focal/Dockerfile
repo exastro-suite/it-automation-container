@@ -1,10 +1,24 @@
 ##############################################################################
+# Arguments from command line
+
+#ARG EXASTRO_ITA_VER
+#ARG EXASTRO_ITA_LANG
+#ARG EXASTRO_ITA_DB_NAME
+#ARG EXASTRO_ITA_DB_USERNAME
+#ARG EXASTRO_ITA_DB_PASSWORD
+
+
+##############################################################################
 # Stage: Create artifacts
 
 FROM debian:buster as builder
 
-# arguments from command line
 ARG EXASTRO_ITA_VER
+ARG EXASTRO_ITA_LANG
+ARG EXASTRO_ITA_INSTALL_DIR
+ARG EXASTRO_ITA_DB_NAME
+ARG EXASTRO_ITA_DB_USERNAME
+ARG EXASTRO_ITA_DB_PASSWORD
 
 # update root ca if any
 RUN --mount=type=secret,id=extra-root-ca \
@@ -27,6 +41,8 @@ RUN ./create-artifacts.sh
 
 FROM mariadb:10.5-focal
 
+ENV EXASTRO_ITA_VER=${EXASTRO_ITA_VER}
+ENV EXASTRO_ITA_LANG=${EXASTRO_ITA_LANG}
+
 # Copy artifact from builder
-WORKDIR /
 COPY --from=builder /workspace/artifacts /

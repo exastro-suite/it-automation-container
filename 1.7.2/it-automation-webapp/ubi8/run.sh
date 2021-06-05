@@ -10,7 +10,7 @@ source $BASE_DIR/constants.sh
 ##############################################################################
 # Run container
 
-$BASE_DIR/stop-and-delete.sh
+$BASE_DIR/stop.sh
 
 VOLUME_OPTION=""
 if [ "$1" = "-v" ]; then
