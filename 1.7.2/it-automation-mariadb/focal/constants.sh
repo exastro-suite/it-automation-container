@@ -4,7 +4,7 @@
 # Exastro IT Automation
 export EXASTRO_ITA_VER="$(basename $(dirname $(dirname $(cd $(dirname $0); pwd))))"
 export EXASTRO_ITA_LANG="${EXASTRO_ITA_LANG:-ja}"
-export EXASTRO_ITA_INSTALL_DIR="${EXASTRO_ITA_LANG:-/exastro}"
+export EXASTRO_ITA_INSTALL_DIR="${EXASTRO_ITA_INSTALL_DIR:-/exastro}"
 
 # Database
 export EXASTRO_ITA_DB_HOST=${EXASTRO_ITA_DB_HOST:-localhost}
