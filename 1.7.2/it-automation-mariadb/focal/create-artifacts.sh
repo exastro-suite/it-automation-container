@@ -1,13 +1,20 @@
-#!/bin/bash
+#!/bin/bash -ux
 
-ITA_VERSION=1.7.1
-ITA_INSTALL_DIR=/exastro
-ITA_DB_NAME=ita_db
-ITA_DB_USERNAME=ita_db_user
-ITA_DB_PASSWORD=ita_db_password
+##############################################################################
+# Constants
+
+declare -A EXASTRO_ITA_LANG_TABLE=(
+    ["en"]="en_US"
+    ["ja"]="ja_JP"
+)
+
+
+##############################################################################
+# Install essential packages
 
 apt-get update
 apt-get install -y curl
+
 
 ##############################################################################
 # Create workspace directory
@@ -19,10 +26,10 @@ mkdir -p "${WORKSPACE_DIR}"
 ##############################################################################
 # Download and unpack installer
 
-curl -OL https://github.com/exastro-suite/it-automation/releases/download/v${ITA_VERSION}/exastro-it-automation-${ITA_VERSION}.tar.gz
-tar zxvf exastro-it-automation-${ITA_VERSION}.tar.gz
+curl -OL https://github.com/exastro-suite/it-automation/releases/download/v${EXASTRO_ITA_VER}/exastro-it-automation-${EXASTRO_ITA_VER}.tar.gz
+tar zxvf exastro-it-automation-${EXASTRO_ITA_VER}.tar.gz
 
-INSTALLER_DIR="${WORKSPACE_DIR}/it-automation-${ITA_VERSION}"
+INSTALLER_DIR="${WORKSPACE_DIR}/it-automation-${EXASTRO_ITA_VER}"
 
 
 ##############################################################################
@@ -49,12 +56,18 @@ ln -s /var/log/mysql "${MARIADB_LOG_DIR}"
 # Copy SQL files to the docker entrypoint initdb directory
 
 # Constants
-SRC_SQL_DIR="${INSTALLER_DIR}/ita_install_package/install_scripts/sql"
-DST_SQL_DIR="${ARTIFACTS_DIR}/docker-entrypoint-initdb.d"
-
 SRC_SQL_FILES=(
-    "${SRC_SQL_DIR}/create-db-and-user_for_MySQL.sql"
+    "${INSTALLER_DIR}/ita_install_package/install_scripts/sql/create-db-and-user_for_MySQL.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-a.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-m.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-n.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-n2.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-n3.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-c.sql"
+    "${INSTALLER_DIR}/ita_install_package/ITA/ita-sqlscripts/${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}_mysql_ita_model-m2.sql"
 )
+
+DST_SQL_DIR="${ARTIFACTS_DIR}/docker-entrypoint-initdb.d"
 
 # Ensure destination directory exists
 mkdir -p "${DST_SQL_DIR}"
@@ -70,14 +83,14 @@ do
     cp "${SRC_SQL_FILE}" "${DST_SQL_FILE}"
 
     # Modify SQL file to set the install directory
-    sed -i -e "s:%%%%%ITA_DIRECTORY%%%%%:${ITA_INSTALL_DIR}:g" "${DST_SQL_FILE}"
+    sed -i -e "s:%%%%%ITA_DIRECTORY%%%%%:${EXASTRO_ITA_INSTALL_DIR}:g" "${DST_SQL_FILE}"
 
     # Modify SQL file with "create-db-and-user_for_MySQL.sql" specific replacement
     if [ "$(basename $SRC_SQL_FILE)" = "create-db-and-user_for_MySQL.sql" ]; then
         sed -i \
-            -e "s/ITA_DB/$ITA_DB_NAME/g" \
-            -e "s/ITA_USER/$ITA_DB_USERNAME/g" \
-            -e "s/ITA_PASSWD/$ITA_DB_PASSWORD/g" \
+            -e "s/ITA_DB/$EXASTRO_ITA_DB_NAME/g" \
+            -e "s/ITA_USER/$EXASTRO_ITA_DB_USERNAME/g" \
+            -e "s/ITA_PASSWD/$EXASTRO_ITA_DB_PASSWORD/g" \
             -e "s/^CREATE DATABASE /ALTER DATABASE /g" \
             "${DST_SQL_FILE}"
     fi
