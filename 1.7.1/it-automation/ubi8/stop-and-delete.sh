@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -xu
 
 ##############################################################################
 # Load constants
@@ -8,7 +8,7 @@ source $BASE_DIR/constants.sh
 
 
 ##############################################################################
-# Clean
+# Stop and delete container
 
-docker stop ${BUILDER_CONTAINER_NAME}
-docker rm ${BUILDER_CONTAINER_NAME}
+docker stop ${IMAGE_NAME}
+docker rm ${IMAGE_NAME}
