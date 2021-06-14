@@ -1,13 +1,14 @@
 #!/bin/bash -ex
 
 ##############################################################################
-# Load variables
+# Load constants
 
-source $(cd $(dirname $0); pwd)/vars.sh
+BASE_DIR=$(cd $(dirname $0); pwd)
+source $BASE_DIR/constants.sh
 
 
 ##############################################################################
 # Clean
 
-docker stop ${EXASTRO_ITA_CONTAINER_NAME}
-docker rm ${EXASTRO_ITA_CONTAINER_NAME}
+docker stop ${BUILDER_CONTAINER_NAME}
+docker rm ${BUILDER_CONTAINER_NAME}

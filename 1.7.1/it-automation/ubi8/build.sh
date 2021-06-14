@@ -1,9 +1,10 @@
 #!/bin/bash -xe
 
 ##############################################################################
-# Load variables
+# Load constants
 
-source $(cd $(dirname $0); pwd)/vars.sh
+BASE_DIR=$(cd $(dirname $0); pwd)
+source $BASE_DIR/constants.sh
 
 
 ##############################################################################
@@ -17,7 +18,7 @@ EXASTRO_ITA_UNPACK_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR}/it-automation-${EXASTRO_IT
 # Build image
 
 docker build \
-    --tag ${EXASTRO_ITA_IMAGE_NAME} \
+    --tag ${IMAGE_FULL_NAME} \
     --build-arg EXASTRO_ITA_VER \
     ./
 
@@ -26,30 +27,30 @@ docker run \
     --privileged \
     --env EXASTRO_ITA_VER \
     --env EXASTRO_ITA_LANG \
-    --name ${EXASTRO_ITA_CONTAINER_NAME} \
-    ${EXASTRO_ITA_IMAGE_NAME}
+    --name ${BUILDER_CONTAINER_NAME} \
+    ${IMAGE_FULL_NAME}
 
 sleep 10
 
 docker exec \
     --tty \
-    ${EXASTRO_ITA_CONTAINER_NAME} \
+    ${BUILDER_CONTAINER_NAME} \
     /root/preprocess.sh
 
 docker exec \
     --tty \
     --workdir=${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts \
-    ${EXASTRO_ITA_CONTAINER_NAME} \
+    ${BUILDER_CONTAINER_NAME} \
     /bin/sh -x ita_installer.sh
 
 docker exec \
     --tty \
-    ${EXASTRO_ITA_CONTAINER_NAME} \
+    ${BUILDER_CONTAINER_NAME} \
     /root/postprocess.sh
 
 docker stop \
-    ${EXASTRO_ITA_CONTAINER_NAME}
+    ${BUILDER_CONTAINER_NAME}
 
 docker commit \
-    ${EXASTRO_ITA_CONTAINER_NAME} \
-    ${EXASTRO_ITA_IMAGE_NAME}
+    ${BUILDER_CONTAINER_NAME} \
+    ${IMAGE_FULL_NAME}

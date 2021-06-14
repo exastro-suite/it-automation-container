@@ -70,8 +70,8 @@ dnf config-manager --disable epel epel-modular
 ##############################################################################
 # Set system locale and system timezone
 
-# dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
-# localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+#dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+#localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
 
 timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
 

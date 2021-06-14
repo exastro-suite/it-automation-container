@@ -1,12 +1,13 @@
 #!/bin/bash -xe
 
 ##############################################################################
-# Load variables
+# Load constants
 
-source $(cd $(dirname $0); pwd)/vars.sh
+BASE_DIR=$(cd $(dirname $0); pwd)
+source $BASE_DIR/constants.sh
 
 
 ##############################################################################
 # Push container image
 
-docker push "$EXASTRO_ITA_IMAGE_NAME"
+docker push "$IMAGE_FULL_NAME"

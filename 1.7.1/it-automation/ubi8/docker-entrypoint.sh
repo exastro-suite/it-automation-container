@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+##############################################################################
+# Initialize volume
+
 initialize_volume() {
     local VOLUME_TYPE=$1
     local VOLUME_NAME=exastro-${VOLUME_TYPE}-volume
@@ -27,6 +30,10 @@ initialize_volume() {
         echo "Volume is already initialized. (type=${VOLUME_TYPE})"
     fi
 }
+
+
+##############################################################################
+# Main
 
 echo "entry point parameters ... $@"
 

@@ -1,15 +1,16 @@
 #!/bin/bash -x
 
 ##############################################################################
-# Load variables
+# Load constants
 
 BASE_DIR=$(cd $(dirname $0); pwd)
-source $BASE_DIR/vars.sh
+source $BASE_DIR/constants.sh
+
 
 ##############################################################################
 # Run container
 
-$BASE_DIR/stop.sh
+$BASE_DIR/stop-and-delete.sh
 
 VOLUME_OPTION=""
 if [ "$1" = "-v" ]; then
@@ -24,7 +25,7 @@ if [ "$1" = "-v" ]; then
 fi
 
 docker run \
-    --name test-ita \
+    --name "${IMAGE_NAME}" \
     --privileged \
     --add-host=exastro-it-automation:127.0.0.1 \
     -d \
@@ -32,4 +33,4 @@ docker run \
     -p 10443:443 \
     ${FILE_VOLUME_OPTION} \
     ${DATABASE_VOLUME_OPTION} \
-    ${EXASTRO_ITA_IMAGE_NAME}
+    "${IMAGE_FULL_NAME}"
