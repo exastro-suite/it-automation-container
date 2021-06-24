@@ -53,7 +53,8 @@ cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_a
 install_mode:Install_Online
 ita_directory:/exastro
 ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:CentOS8
+linux_os:RHEL8
+distro_mariadb:no
 db_root_password:ita_root_password
 db_name:ita_db
 db_username:ita_db_user
@@ -78,17 +79,38 @@ dnf update -y
 
 
 ##############################################################################
+# DNF repository
+
+cat << 'EOS' > /etc/yum.repos.d/centos8.repo
+[baseos]
+name=CentOS Linux $releasever - BaseOS
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=BaseOS&infra=$infra
+#baseurl=http://mirror.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/
+gpgcheck=0
+enabled=0
+
+[appstream]
+name=CentOS Linux $releasever - AppStream
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=AppStream&infra=$infra
+#baseurl=http://mirror.centos.org/$contentdir/$releasever/AppStream/$basearch/os/
+gpgcheck=0
+enabled=0
+EOS
+
+
+##############################################################################
 # dnf and repository configuration
 
 dnf install -y dnf-plugins-core
-dnf config-manager --enable powertools
+dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+dnf config-manager --disable epel epel-modular
 
 
 ##############################################################################
 # Set system locale and system timezone
 
-dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
-localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+#dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+#localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
 
 timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
 
@@ -97,12 +119,14 @@ timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]
 # install common packages (installer requirements)
 
 dnf install -y diffutils procps openssl
+dnf install -y --enablerepo=baseos expect
 
 
 ##############################################################################
 # install web related packages
 
 dnf install -y hostname # apache ssl needs hostname command
+dnf install -y --enablerepo=appstream telnet
 
 
 ##############################################################################
@@ -110,3 +134,32 @@ dnf install -y hostname # apache ssl needs hostname command
 #   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
 
 find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
+
+
+##############################################################################
+# install ainsible related packages
+
+dnf install -y --enablerepo=epel sshpass
+
+
+##############################################################################
+# install MariaDB related packages
+#   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
+
+dnf install -y perl-DBI libaio libsepol lsof
+dnf install -y rsync iproute # additional installation
+dnf install -y --enablerepo=appstream boost-program-options
+
+
+##############################################################################
+# modify scripts (bin/ita_builder_core.sh)
+#   for DNF repository check
+
+sed -i \
+    -E 's/ (create_repo_check .+) >>/ echo "----- SKIP \1 -----" >>/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
+sed -i \
+    -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+

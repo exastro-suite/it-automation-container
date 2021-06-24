@@ -74,6 +74,7 @@ EOS
 ##############################################################################
 # Update all installed packages
 
+yum install -y dnf
 dnf update -y
 
 
