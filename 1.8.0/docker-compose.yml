@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   webapp:
-    image: it-automation-webapp:1.7.2-centos8-ja
+    image: it-automation-webapp:1.8.0-centos8-ja
     privileged: true
     ports:
       - "8080:80"
@@ -11,7 +11,7 @@ services:
       - "exastro-it-automation:127.0.0.1"
 
   database:
-    image: it-automation-mariadb:1.7.2-focal-ja
+    image: it-automation-mariadb:1.8.0-focal-ja
     environment:
       MARIADB_ROOT_PASSWORD: ita_db_root_password
       MARIADB_DATABASE: ita_db

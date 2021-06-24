@@ -10,9 +10,6 @@ LABEL name="Exastro IT Automation" \
       summary="Exastro IT Automation container." \
       description="This container provides Exastro IT Automation service."
 
-##############################
-COPY it-automation-1.8.0/ /root/it-automation-1.8.0/
-
 # Required Licenses
 COPY licenses/ /licenses/
 

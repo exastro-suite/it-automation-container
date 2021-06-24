@@ -8,29 +8,18 @@ source $BASE_DIR/constants.sh
 
 
 ##############################################################################
-# Constants
-
-EXASTRO_ITA_UNPACK_BASE_DIR=/root
-EXASTRO_ITA_UNPACK_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR}/it-automation-${EXASTRO_ITA_VER}
-
-
-##############################################################################
 # Build image
 
 docker build \
     --tag ${IMAGE_FULL_NAME} \
     --build-arg EXASTRO_ITA_VER \
-    --build-arg EXASTRO_ITA_LANG \
-    --build-arg EXASTRO_ITA_INSTALL_DIR \
-    --build-arg EXASTRO_ITA_DB_USERNAME \
-    --build-arg EXASTRO_ITA_DB_NAME \
-    --build-arg EXASTRO_ITA_DB_HOST \
-    --build-arg EXASTRO_ITA_DB_PORT \
     ./
 
 docker run \
     --detach \
     --privileged \
+    --env EXASTRO_ITA_VER \
+    --env EXASTRO_ITA_LANG \
     --name ${BUILDER_CONTAINER_NAME} \
     ${IMAGE_FULL_NAME}
 
@@ -38,6 +27,9 @@ sleep 10
 
 docker exec \
     --tty \
+    --env EXASTRO_ITA_INSTALLER_URL \
+    --env EXASTRO_ITA_UNPACK_BASE_DIR \
+    --env EXASTRO_ITA_UNPACK_DIR \
     ${BUILDER_CONTAINER_NAME} \
     /root/preprocess.sh
 

@@ -22,29 +22,10 @@ export IMAGE_HOST_AND_PATH="${IMAGE_HOST_AND_PATH:-}"
 export IMAGE_FULL_NAME="${IMAGE_HOST_AND_PATH}${IMAGE_NAME}:${EXASTRO_ITA_VER}-${DISTRO_SYMBOL}-${EXASTRO_ITA_LANG}"
 
 # Builder container
-export BUILDER_CONTAINER_NAME="${IMAGE_NAME}-builder"
+export BUILDER_CONTAINER_NAME="${IMAGE_NAME}-${EXASTRO_ITA_VER}-${DISTRO_SYMBOL}-${EXASTRO_ITA_LANG}-builder"
 
-
-##############################################################################
-# Print constants
-
-echo "== CONSTANTS =============================="
-echo "Exastro IT Automation"
-echo "    EXASTRO_ITA_VER=${EXASTRO_ITA_VER}"
-echo "    EXASTRO_ITA_LANG=${EXASTRO_ITA_LANG}"
-echo "    EXASTRO_ITA_INSTALL_DIR=${EXASTRO_ITA_INSTALL_DIR}"
-echo "Database"
-echo "    EXASTRO_ITA_DB_HOST=${EXASTRO_ITA_DB_HOST}"
-echo "    EXASTRO_ITA_DB_PORT=${EXASTRO_ITA_DB_PORT}"
-echo "    EXASTRO_ITA_DB_NAME=${EXASTRO_ITA_DB_NAME}"
-echo "    EXASTRO_ITA_DB_USERNAME=${EXASTRO_ITA_DB_USERNAME}"
-echo "    EXASTRO_ITA_DB_PASSWORD=${EXASTRO_ITA_DB_PASSWORD}"
-echo "Distro"
-echo "    DISTRO_SYMBOL=${DISTRO_SYMBOL}"
-echo "Image"
-echo "    IMAGE_NAME=${IMAGE_NAME}"
-echo "    IMAGE_HOST_AND_PATH=${IMAGE_HOST_AND_PATH}"
-echo "    IMAGE_FULL_NAME=${IMAGE_FULL_NAME}"
-echo "Image"
-echo "    BUILDER_CONTAINER_NAME=${BUILDER_CONTAINER_NAME}"
-echo "==========================================="
+# Preprocess
+export EXASTRO_ITA_INSTALLER_URL=${EXASTRO_ITA_INSTALLER_URL:-https://github.com/exastro-suite/it-automation/releases/download/v${EXASTRO_ITA_VER}/exastro-it-automation-${EXASTRO_ITA_VER}.tar.gz}
+export EXASTRO_ITA_UNPACK_BASE_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR:-/root}
+export EXASTRO_ITA_UNPACK_DIR_NAME=${EXASTRO_ITA_UNPACK_DIR_NAME:-it-automation-${EXASTRO_ITA_VER}}
+export EXASTRO_ITA_UNPACK_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR}/${EXASTRO_ITA_UNPACK_DIR_NAME}

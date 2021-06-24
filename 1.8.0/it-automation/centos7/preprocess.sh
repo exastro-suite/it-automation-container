@@ -1,10 +1,28 @@
 #!/bin/bash -ex
 
 ##############################################################################
-# Variables
+# Check required environment variables
 
-EXASTRO_ITA_UNPACK_BASE_DIR=/root
-EXASTRO_ITA_UNPACK_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR}/it-automation-${EXASTRO_ITA_VER}
+REQUIRED_ENV_VARS=(
+    EXASTRO_ITA_VER
+    EXASTRO_ITA_LANG
+    EXASTRO_ITA_INSTALLER_URL
+    EXASTRO_ITA_UNPACK_BASE_DIR
+    EXASTRO_ITA_UNPACK_DIR
+)
+
+for VAR in "${REQUIRED_ENV_VARS[@]}"; do
+    if [ -v ${VAR} ]; then
+        echo "${VAR}=${!VAR}"
+    else
+        echo "Required environment variable $VAR is not defined."
+        exit 1
+    fi
+done
+
+
+##############################################################################
+# Tables
 
 declare -A EXASTRO_ITA_LANG_TABLE=(
     ["en"]="en_US"
@@ -23,24 +41,9 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 
 
 ##############################################################################
-# Set system locale and system timezone
-
-dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
-localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
-
-timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
-
-
-##############################################################################
-# install common packages (installer requirements)
-
-dnf install -y openssl
-
-
-##############################################################################
 # Download Exastro IT Automation Installer
 
-curl -SL https://github.com/exastro-suite/it-automation/releases/download/v${EXASTRO_ITA_VER}/exastro-it-automation-${EXASTRO_ITA_VER}.tar.gz | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
 
 
 ##############################################################################
@@ -48,12 +51,12 @@ curl -SL https://github.com/exastro-suite/it-automation/releases/download/v${EXA
 
 cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
 install_mode:Install_Online
-ita_directory:${EXASTRO_ITA_INSTALL_DIR}
+ita_directory:/exastro
 ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
 linux_os:CentOS8
 db_root_password:ita_root_password
-db_name:${EXASTRO_ITA_DB_NAME}
-db_username:${EXASTRO_ITA_DB_USERNAME}
+db_name:ita_db
+db_username:ita_db_user
 db_password:ita_db_password
 ita_base:yes
 material:no
@@ -69,6 +72,13 @@ EOS
 
 
 ##############################################################################
+# Update all installed packages
+
+yum install -y dnf
+dnf update -y
+
+
+##############################################################################
 # dnf and repository configuration
 
 dnf install -y dnf-plugins-core
@@ -76,9 +86,18 @@ dnf config-manager --enable powertools
 
 
 ##############################################################################
-# install common packages
+# Set system locale and system timezone
 
-dnf install -y diffutils procps # installer needs diff and ps
+dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# install common packages (installer requirements)
+
+dnf install -y diffutils procps openssl
 
 
 ##############################################################################

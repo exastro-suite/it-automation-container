@@ -8,13 +8,6 @@ source $BASE_DIR/constants.sh
 
 
 ##############################################################################
-# Constants
-
-EXASTRO_ITA_UNPACK_BASE_DIR=/root
-EXASTRO_ITA_UNPACK_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR}/it-automation-${EXASTRO_ITA_VER}
-
-
-##############################################################################
 # Build image
 
 docker build \
@@ -34,6 +27,9 @@ sleep 10
 
 docker exec \
     --tty \
+    --env EXASTRO_ITA_INSTALLER_URL \
+    --env EXASTRO_ITA_UNPACK_BASE_DIR \
+    --env EXASTRO_ITA_UNPACK_DIR \
     ${BUILDER_CONTAINER_NAME} \
     /root/preprocess.sh
 
