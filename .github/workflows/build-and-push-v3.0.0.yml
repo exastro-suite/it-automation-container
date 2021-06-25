@@ -5,7 +5,7 @@ on:
       EXASTRO_ITA_VER:
         description: 'Version number of Exastro IT Automation'
         required: false
-        default: '1.7.2'
+        default: '1.8.0'
         
       EXASTRO_ITA_LANG:
         description: 'Language of Exastro IT Automation'
@@ -22,6 +22,16 @@ on:
         required: false
         default: 'ubi8'
 
+      EXASTRO_ITA_INSTALLER_URL:
+        description: 'Installer URL'
+        required: false
+        default: 'https://github.com/exastro-suite/it-automation/archive/refs/heads/v${EXASTRO_ITA_VER}.tar.gz'
+
+      EXASTRO_ITA_UNPACK_DIR_NAME:
+        description: 'Installer unpack dir name'
+        required: false
+        default: 'it-automation-${EXASTRO_ITA_VER}'
+        
 jobs:
   build_and_push_image:
     name: Build and push image
@@ -29,7 +39,10 @@ jobs:
     steps:
       - name: Environment variables
         run: |
+          echo "EXASTRO_ITA_VER=${{ github.event.inputs.EXASTRO_ITA_VER }}" >> $GITHUB_ENV
           echo "EXASTRO_ITA_LANG=${{ github.event.inputs.EXASTRO_ITA_LANG }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_INSTALLER_URL=${{ github.event.inputs.EXASTRO_ITA_INSTALLER_URL }}" >> $GITHUB_ENV
+          echo "EXASTRO_ITA_UNPACK_DIR_NAME=${{ github.event.inputs.EXASTRO_ITA_UNPACK_DIR_NAME }}" >> $GITHUB_ENV
           echo "IMAGE_HOST_AND_PATH=ghcr.io/${{ github.repository_owner }}/" >> $GITHUB_ENV
           echo "BUILD_TARGET_DIR=${{ github.event.inputs.EXASTRO_ITA_VER }}/${{ github.event.inputs.IMAGE_NAME }}/${{ github.event.inputs.DISTRO_SYMBOL }}" >> $GITHUB_ENV
         
