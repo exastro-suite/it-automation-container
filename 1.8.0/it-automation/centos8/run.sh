@@ -12,6 +12,18 @@ source $BASE_DIR/constants.sh
 
 $BASE_DIR/stop-and-delete.sh
 
+VOLUME_OPTION=""
+if [ "$1" = "-v" ]; then
+    FILE_VOLUME_HOST_PATH=$BASE_DIR/tmp/exastro-file-volume
+    mkdir -p -m 777 ${FILE_VOLUME_HOST_PATH}
+
+    DATABASE_VOLUME_HOST_PATH=$BASE_DIR/tmp/exastro-database-volume
+    mkdir -p -m 777 ${DATABASE_VOLUME_HOST_PATH}
+
+    FILE_VOLUME_OPTION="--volume ${FILE_VOLUME_HOST_PATH}:/exastro-file-volume --env EXASTRO_AUTO_FILE_VOLUME_INIT=true"
+    DATABASE_VOLUME_OPTION="--volume ${DATABASE_VOLUME_HOST_PATH}:/exastro-database-volume --env EXASTRO_AUTO_DATABASE_VOLUME_INIT=true"
+fi
+
 docker run \
     --name "${IMAGE_NAME}" \
     --privileged \
@@ -19,4 +31,6 @@ docker run \
     -d \
     -p 8080:80 \
     -p 10443:443 \
+    ${FILE_VOLUME_OPTION} \
+    ${DATABASE_VOLUME_OPTION} \
     "${IMAGE_FULL_NAME}"

@@ -1,4 +1,4 @@
-FROM centos:8
+FROM centos:7
 
 ARG EXASTRO_ITA_VER
 
