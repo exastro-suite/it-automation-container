@@ -90,7 +90,7 @@ dnf install -y dnf-plugins-core
 ##############################################################################
 # Set system locale and system timezone
 
-dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+dnf -y install langpacks-"$EXASTRO_ITA_LANG"
 localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
 
 timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
