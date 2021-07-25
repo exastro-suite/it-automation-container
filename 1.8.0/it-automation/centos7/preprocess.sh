@@ -24,16 +24,6 @@ done
 ##############################################################################
 # Tables
 
-declare -A EXASTRO_ITA_LANG_TABLE=(
-    ["en"]="en_US"
-    ["ja"]="ja_JP"
-)
-
-declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
-    ["en"]="C.utf-8"
-    ["ja"]="ja_JP.UTF-8"
-)
-
 declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
     ["en"]="UTC"
     ["ja"]="Asia/Tokyo"
@@ -52,7 +42,8 @@ curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
 cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
 install_mode:Install_Online
 ita_directory:/exastro
-ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
+ita_language:${
+[$EXASTRO_ITA_LANG]}
 linux_os:CentOS7
 distro_mariadb:yes
 db_root_password:ita_root_password
@@ -88,10 +79,7 @@ dnf install -y dnf-plugins-core
 
 
 ##############################################################################
-# Set system locale and system timezone
-
-dnf -y install langpacks-"$EXASTRO_ITA_LANG"
-localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+# Set system timezone
 
 timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
 
