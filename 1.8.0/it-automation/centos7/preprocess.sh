@@ -84,7 +84,7 @@ dnf update -y
 # dnf and repository configuration
 
 dnf install -y dnf-plugins-core
-dnf config-manager --enable powertools
+#dnf config-manager --enable powertools
 
 
 ##############################################################################
