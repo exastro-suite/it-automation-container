@@ -54,6 +54,7 @@ install_mode:Install_Online
 ita_directory:/exastro
 ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
 linux_os:CentOS8
+distro_mariadb:yes
 db_root_password:ita_root_password
 db_name:ita_db
 db_username:ita_db_user

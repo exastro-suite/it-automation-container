@@ -25,12 +25,12 @@ on:
       EXASTRO_ITA_INSTALLER_URL:
         description: 'Installer URL'
         required: false
-        default: 'https://github.com/exastro-suite/it-automation/archive/refs/heads/v${EXASTRO_ITA_VER}.tar.gz'
+#        default: 'https://github.com/exastro-suite/it-automation/archive/refs/heads/v${EXASTRO_ITA_VER}.tar.gz'
 
       EXASTRO_ITA_UNPACK_DIR_NAME:
         description: 'Installer unpack dir name'
         required: false
-        default: 'it-automation-${EXASTRO_ITA_VER}'
+#        default: 'it-automation-${EXASTRO_ITA_VER}'
         
 jobs:
   build_and_push_image:
