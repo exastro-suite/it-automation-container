@@ -2,6 +2,8 @@ FROM centos:7
 
 ARG EXASTRO_ITA_VER
 
+ENV LANG=en_US.UTF-8
+
 ### Required OpenShift Labels
 LABEL name="Exastro IT Automation" \
       vendor="NEC Corporation" \
