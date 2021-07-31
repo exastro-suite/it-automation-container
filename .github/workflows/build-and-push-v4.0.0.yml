@@ -1,0 +1,67 @@
+name: Build and push - ver.4.0.0
+on:
+  workflow_dispatch:
+    inputs:
+      EXASTRO_ITA_VER:
+        description: Version number of Exastro IT Automation
+        required: false
+        default: '1.8.0'
+        
+      EXASTRO_ITA_LANG:
+        description: Language of Exastro IT Automation
+        required: false
+        default: ja
+      
+      IMAGE_NAME:
+        description: Image name
+        required: false
+        default: it-automation
+
+      DISTRO_SYMBOL:
+        description: Distro symbol of base image
+        required: false
+        default: ubi8
+
+      EXASTRO_ITA_INSTALLER_URL:
+        description: |
+            Installer URL
+            Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.8.0.tar.gz
+        required: false
+
+      EXASTRO_ITA_UNPACK_DIR_NAME:
+        description: |
+            Installer unpack dir name.
+            Example: it-automation-1.8.0
+        required: false
+        
+jobs:
+  build_and_push_image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Environment variables
+        run: |
+          function set_github_env() {
+            if [ -n "$2" ]; then
+              echo "$1=$2" >> $GITHUB_ENV
+            fi
+          }
+
+          set_github_env "BUILD_TARGET_DIR" "${{ github.event.inputs.EXASTRO_ITA_VER }}/${{ github.event.inputs.IMAGE_NAME }}/${{ github.event.inputs.DISTRO_SYMBOL }}"
+          set_github_env "EXASTRO_ITA_INSTALLER_URL" "${{ github.event.inputs.EXASTRO_ITA_INSTALLER_URL }}"
+          set_github_env "EXASTRO_ITA_UNPACK_DIR_NAME" "${{ github.event.inputs.EXASTRO_ITA_UNPACK_DIR_NAME }}"
+          set_github_env "IMAGE_HOST_AND_PATH" "ghcr.io/${{ github.repository_owner }}/"
+        
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          cd $BUILD_TARGET_DIR
+          make build
+
+      - name: Push
+        run: |
+          cd $BUILD_TARGET_DIR
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
+          make push
