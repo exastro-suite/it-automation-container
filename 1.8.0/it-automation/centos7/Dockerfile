@@ -2,8 +2,6 @@ FROM centos:7
 
 ARG EXASTRO_ITA_VER
 
-ENV LANG=en_US.UTF-8
-
 ### Required OpenShift Labels
 LABEL name="Exastro IT Automation" \
       vendor="NEC Corporation" \
@@ -20,6 +18,11 @@ COPY preprocess.sh postprocess.sh /root/
 
 # Entrypoint script
 COPY docker-entrypoint.sh /
+
+# WORKAROUND
+# No existence of env LANG causes following error in installing ansible.
+#    UnicodeEncodeError: 'ascii' codec can't encode character '\xe9' in position 117: ordinal not in range(128)
+ENV LANG=en_US.UTF-8
 
 # Entrypoint and default parameters
 ENTRYPOINT ["/docker-entrypoint.sh"]
