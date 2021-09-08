@@ -3,8 +3,18 @@
 ##############################################################################
 # Check required environment variables
 
-for VAR in EXASTRO_ITA_VER EXASTRO_ITA_LANG; do
-    if [ ! -v $VAR ]; then
+REQUIRED_ENV_VARS=(
+    EXASTRO_ITA_VER
+    EXASTRO_ITA_LANG
+    EXASTRO_ITA_INSTALLER_URL
+    EXASTRO_ITA_UNPACK_BASE_DIR
+    EXASTRO_ITA_UNPACK_DIR
+)
+
+for VAR in "${REQUIRED_ENV_VARS[@]}"; do
+    if [ -v ${VAR} ]; then
+        echo "${VAR}=${!VAR}"
+    else
         echo "Required environment variable $VAR is not defined."
         exit 1
     fi
@@ -12,10 +22,7 @@ done
 
 
 ##############################################################################
-# Variables
-
-EXASTRO_ITA_UNPACK_BASE_DIR=/root
-EXASTRO_ITA_UNPACK_DIR=${EXASTRO_ITA_UNPACK_BASE_DIR}/it-automation-${EXASTRO_ITA_VER}
+# Tables
 
 declare -A EXASTRO_ITA_LANG_TABLE=(
     ["en"]="en_US"
@@ -31,6 +38,39 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
     ["en"]="UTC"
     ["ja"]="Asia/Tokyo"
 )
+
+
+##############################################################################
+# Download Exastro IT Automation Installer
+
+curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+
+
+##############################################################################
+# Create ita_answers.txt
+
+cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
+install_mode:Install_Online
+ita_directory:/exastro
+ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
+linux_os:RHEL8
+distro_mariadb:no
+db_root_password:ita_root_password
+db_name:ita_db
+db_username:ita_db_user
+db_password:ita_db_password
+ita_base:yes
+material:no
+createparam:yes
+hostgroup:yes
+ansible_driver:yes
+cobbler_driver:no
+terraform_driver:yes
+cicd_for_iac:no
+ita_domain:exastro-it-automation.local
+certificate_path:
+private_key_path:
+EOS
 
 
 ##############################################################################
@@ -91,56 +131,26 @@ dnf install -y --enablerepo=appstream telnet
 
 
 ##############################################################################
+# Python interpreter warning issue (container only)
+#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
+
+find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
+
+
+##############################################################################
 # install ainsible related packages
 
 dnf install -y --enablerepo=epel sshpass
 
 
 ##############################################################################
-# install MariaDB
+# install MariaDB related packages
 #   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
-
-curl -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
-chmod +x mariadb_repo_setup
-./mariadb_repo_setup
+#   note: MariaDB 10.6 requires libpmem
 
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
-dnf install -y --enablerepo=appstream boost-program-options
-dnf install -y --repo=mariadb-main MariaDB-server
-systemctl enable mariadb
-systemctl start mariadb
-
-
-##############################################################################
-# Download Exastro IT Automation Installer
-
-curl -SL https://github.com/exastro-suite/it-automation/releases/download/v${EXASTRO_ITA_VER}/exastro-it-automation-${EXASTRO_ITA_VER}.tar.gz | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
-
-
-##############################################################################
-# Create ita_answers.txt
-
-cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
-install_mode:Install_Online
-ita_directory:/exastro
-ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:RHEL8
-db_root_password:ita_root_password
-db_name:ita_db
-db_username:ita_db_user
-db_password:ita_db_password
-ita_base:yes
-material:no
-createparam:yes
-hostgroup:yes
-ansible_driver:yes
-cobbler_driver:no
-terraform_driver:yes
-ita_domain:exastro-it-automation.local
-certificate_path:
-private_key_path:
-EOS
+dnf install -y --enablerepo=appstream boost-program-options libpmem
 
 
 ##############################################################################
@@ -153,60 +163,5 @@ sed -i \
 
 sed -i \
     -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
-    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
-
-
-##############################################################################
-# modify scripts (bin/ita_builder_core.sh)
-#   for MariaDB
-
-# ORIGINAL:
-#     if [ RHEL7 or CentOS7 ]
-#         if [ already installed ]
-#             // skip install official MariaDB, then configure (** EXPECT COMMAND MAY NOT WORK !! **)
-#         else
-#             // install official MariaDB, then configure
-#    
-#     if [ RHEL8 or CentOS8 ]
-#         if [ already installed ]
-#             // skip install distro's MariaDB, then configure
-#         else
-#             // installdistro's MariaDB, then configure
-#
-#              |
-#              |
-#              V
-#
-# MODIFIED:
-#     if [ true ]
-#         if [ false ]
-#             // DON'T CARE
-#         else
-#             // COME HERE !!!
-#    
-#     if [ false ]
-#         // DON'T CARE
-
-
-# fall in configuring official MariaDB
-sed -i \
-    -E 's/\[ "\$LINUX_OS" == "RHEL7" -o "\$LINUX_OS" == "CentOS7" \]/"true"/' \
-    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
-
-# skip configuring distribution's MariaDB
-# note: This will also rewrite the condition for "local installation". But actually
-#       no impact on container building because remote installation is always executed.
-sed -i \
-    -E 's/\[ "\$LINUX_OS" == "RHEL8" -o "\$LINUX_OS" == "CentOS8" \]/"false"/' \
-    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
-
-# fall through to MariaDB installation (by installation check failure)
-sed -i \
-    -E 's/yum list installed mariadb-server/yum list installed XXXXXXXXXXXXXX/' \
-    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
-
-# skip configuring DNF repository of MariaDB (already configured in this script).
-sed -i \
-    -E 's/mariadb_repository /#mariadb_repository /' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
