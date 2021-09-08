@@ -63,5 +63,5 @@ jobs:
       - name: Push
         run: |
           cd $BUILD_TARGET_DIR
-          echo "${{ secrets.GHCR_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username "${{ github.repository_owner }}" --password-stdin ghcr.io
           make push
