@@ -48,6 +48,7 @@ jobs:
           }
 
           set_github_env "BUILD_TARGET_DIR" "${{ github.event.inputs.EXASTRO_ITA_VER }}/${{ github.event.inputs.IMAGE_NAME }}/${{ github.event.inputs.DISTRO_SYMBOL }}"
+          set_github_env "EXASTRO_ITA_LANG" "${{ github.event.inputs.EXASTRO_ITA_LANG }}"
           set_github_env "EXASTRO_ITA_INSTALLER_URL" "${{ github.event.inputs.EXASTRO_ITA_INSTALLER_URL }}"
           set_github_env "EXASTRO_ITA_UNPACK_DIR_NAME" "${{ github.event.inputs.EXASTRO_ITA_UNPACK_DIR_NAME }}"
           set_github_env "IMAGE_HOST_AND_PATH" "ghcr.io/${{ github.repository_owner }}/"
