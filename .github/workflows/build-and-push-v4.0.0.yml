@@ -78,4 +78,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: evidence
-          path: tmp/
+          path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/
