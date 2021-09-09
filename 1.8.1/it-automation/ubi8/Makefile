@@ -115,6 +115,20 @@ push:
 	docker push $(IMAGE_FULL_NAME)
 
 
+.PHONY: evidence
+evidence:
+	mkdir tmp
+
+	mkdir tmp/install-log
+	-docker cp \
+		$(BUILDER_CONTAINER_NAME):$(EXASTRO_ITA_UNPACK_DIR)/ita_install_package/install_scripts/log/. \
+		tmp/install-log/
+
+	-docker inspect \
+		$(BUILDER_CONTAINER_NAME) \
+		> tmp/inspect.txt
+
+
 .PHONY: run
 run: delete
 	docker run \
