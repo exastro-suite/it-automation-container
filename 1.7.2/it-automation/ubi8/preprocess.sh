@@ -153,7 +153,8 @@ chmod +x mariadb_repo_setup
 #dnf install -y perl-DBI libaio libsepol lsof
 #dnf install -y rsync iproute # additional installation
 #dnf install -y --enablerepo=appstream boost-program-options libpmem
-dnf install -y --enablerepo=appstream  MariaDB-server
+#dnf install -y --enablerepo=appstream  MariaDB-server
+dnf install -y MariaDB-server
 systemctl enable mariadb
 systemctl start mariadb
 
