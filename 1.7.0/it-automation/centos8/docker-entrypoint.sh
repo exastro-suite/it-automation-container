@@ -1,7 +1,7 @@
-#!/bin/bash -x
+#!/bin/bash -e
 
 ##############################################################################
-# Stop container
+# Main
 
-docker stop test-ita
-docker rm test-ita
+# Execute command
+exec "$@"
