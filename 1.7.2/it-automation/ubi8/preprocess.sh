@@ -144,15 +144,14 @@ dnf install -y --enablerepo=epel sshpass
 ##############################################################################
 # install MariaDB
 #   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
+#   note: MariaDB 10.6 requires libpmem
 
 curl -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
 chmod +x mariadb_repo_setup
 ./mariadb_repo_setup
 
-dnf install -y perl-DBI libaio libsepol lsof
-dnf install -y rsync iproute # additional installation
-dnf install -y --enablerepo=appstream boost-program-options
-dnf install -y --repo=mariadb-main MariaDB-server
+dnf install -y --enablerepo=appstream boost-program-options libpmem
+dnf install -y MariaDB-server
 systemctl enable mariadb
 systemctl start mariadb
 
