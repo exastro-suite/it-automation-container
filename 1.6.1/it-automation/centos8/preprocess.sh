@@ -1,0 +1,129 @@
+#!/bin/bash -ex
+
+##############################################################################
+# Check required environment variables
+
+REQUIRED_ENV_VARS=(
+    EXASTRO_ITA_VER
+    EXASTRO_ITA_LANG
+    EXASTRO_ITA_INSTALLER_URL
+    EXASTRO_ITA_UNPACK_BASE_DIR
+    EXASTRO_ITA_UNPACK_DIR
+)
+
+for VAR in "${REQUIRED_ENV_VARS[@]}"; do
+    if [ -v ${VAR} ]; then
+        echo "${VAR}=${!VAR}"
+    else
+        echo "Required environment variable $VAR is not defined."
+        exit 1
+    fi
+done
+
+
+##############################################################################
+# Tables
+
+declare -A EXASTRO_ITA_LANG_TABLE=(
+    ["en"]="en_US"
+    ["ja"]="ja_JP"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
+    ["en"]="C.utf-8"
+    ["ja"]="ja_JP.UTF-8"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
+    ["en"]="UTC"
+    ["ja"]="Asia/Tokyo"
+)
+
+
+##############################################################################
+# Download Exastro IT Automation Installer
+
+curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+
+
+##############################################################################
+# Create ita_answers.txt
+
+cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
+install_mode:Install_Online
+ita_directory:/exastro
+ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
+linux_os:CentOS8
+db_root_password:ita_root_password
+db_name:ita_db
+db_username:ita_db_user
+db_password:ita_db_password
+ita_base:yes
+material:no
+createparam:yes
+hostgroup:yes
+ansible_driver:yes
+cobbler_driver:no
+terraform_driver:yes
+ita_domain:exastro-it-automation.local
+certificate_path:
+private_key_path:
+EOS
+
+
+##############################################################################
+# Update all installed packages
+
+dnf update -y
+
+
+##############################################################################
+# dnf and repository configuration
+
+dnf install -y dnf-plugins-core
+dnf config-manager --enable powertools
+
+
+##############################################################################
+# Set system locale and system timezone
+
+dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# install common packages (installer requirements)
+
+dnf install -y diffutils procps openssl
+
+
+##############################################################################
+# install web related packages
+
+dnf install -y hostname # apache ssl needs hostname command
+
+
+##############################################################################
+# Python interpreter warning issue (container only)
+#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
+
+find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
+
+
+##############################################################################
+# WORKAROUND: Exastro IT Automation issue #734 (https://github.com/exastro-suite/it-automation/issues/734)
+
+dnf -y install python3-pip
+pip3 install --upgrade pip
+
+
+##############################################################################
+# WORKAROUND: Exastro IT Automation issue #735 (https://github.com/exastro-suite/it-automation/issues/735)
+# modify scripts (bin/ita_builder_core.sh)
+
+sed -i \
+    -E 's/--format=legacy/--format=columns/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
