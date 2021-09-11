@@ -4,23 +4,23 @@ on:
     inputs:
       EXASTRO_ITA_VER:
         description: Version number of Exastro IT Automation
-        required: false
+        required: true
         default: '1.8.1'
         
       EXASTRO_ITA_LANG:
-        description: Language of Exastro IT Automation
-        required: false
-        default: ja
-      
-      IMAGE_NAME:
-        description: Image name
-        required: false
-        default: it-automation
+        description: Languages of Exastro IT Automation
+        required: true
+        default: '["ja", "en"]'
 
       DISTRO_SYMBOL:
         description: Distro symbols of base images
-        required: false
+        required: true
         default: '["ubi8", "centos8", "centos7"]'
+        
+      IMAGE_NAME:
+        description: Image name
+        required: true
+        default: it-automation
 
       # Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.8.1.tar.gz
       EXASTRO_ITA_INSTALLER_URL:
@@ -38,8 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        DISTRO_SYMBOL: ${{ fromJSON(github.event.inputs.DISTRO_SYMBOL) }}
         EXASTRO_ITA_LANG:  ${{ fromJSON(github.event.inputs.EXASTRO_ITA_LANG) }}
+        DISTRO_SYMBOL: ${{ fromJSON(github.event.inputs.DISTRO_SYMBOL) }}
     steps:
       - name: Set environment variables
         run: |
