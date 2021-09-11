@@ -79,5 +79,5 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
-          name: evidence-${{ matrix.DISTRO_SYMBOL }}-${{ matrix.EXASTRO_ITA_LANG }}
+          name: evidence-${{ matrix.EXASTRO_ITA_LANG }}-${{ matrix.DISTRO_SYMBOL }}
           path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/
