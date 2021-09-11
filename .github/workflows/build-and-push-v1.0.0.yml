@@ -10,7 +10,7 @@ on:
       EXASTRO_ITA_LANG:
         description: Language of Exastro IT Automation
         required: false
-        default: ja
+        default: '["ja", "en"]'
       
       IMAGE_NAME:
         description: Image name
