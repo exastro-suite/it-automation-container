@@ -38,8 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        DISTRO_SYMBOL: ${{ fromJSON(github.event.inputs.DISTRO_SYMBOL) }}
         EXASTRO_ITA_LANG:  ${{ fromJSON(github.event.inputs.EXASTRO_ITA_LANG) }}
+        DISTRO_SYMBOL: ${{ fromJSON(github.event.inputs.DISTRO_SYMBOL) }}
     steps:
       - name: Set environment variables
         run: |
