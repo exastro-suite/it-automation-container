@@ -1,4 +1,4 @@
-# リポジトリ`it-automation-container`のビルド
+# リポジトリ`it-automation-container`のビルドとCI
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -46,16 +46,6 @@
   * コンテナイメージのコンテナレジストリへの登録
 
 
-## ワークフロー
-
-GitHub Actionsで利用するワークフローは、GitHub Actionsの仕様に従い、リポジトリの以下の場所に配置している。
-
-```
-it-automation-container
-`-- .github
-    `-- workflows
-```
-
 ## コンテナイメージの構成パターンの方針
 
 Exastro IT Automationの構築方法にはいくつかの選択肢があるため、特定のひとつのバージョンであっても、複数のコンテナイメージを作成する必要がある。
@@ -72,6 +62,40 @@ Exastro IT Automationの構築方法にはいくつかの選択肢があるた�
   * 英語、UBI 8
 
 そのため、CIで特定のひとつのバージョンをビルドする際には、すべての構成パターンを作成するように、ワークフローを構成する。
+
+
+## ワークフロー
+
+GitHub Actionsで利用するワークフローは、GitHub Actionsの仕様に従い、リポジトリの以下の場所に配置している。
+現在はワークフローはひとつだけでVersion 1.0.0としているが、将来的にバージョンアップしたワークフローや、全く異なるワークフローを追加してもよい。
+
+```
+it-automation-container
+`-- .github
+    `-- workflows
+        `-- build-and-push-v1.0.0.yml
+```
+
+ワークフローは以下の手順で実行する。
+  1. リポジトリ`it-automation-container`でタブ「Actions」を選択
+  1. ワークフロー「Build and push - ver.1.0.0」を選択
+  1. ボタン「Run workflow」を押下
+  1. 表示されたダイアログに必要な項目を入力し、緑色のボタン「Run workflow」を押下
+
+![run-workflow](pics/run-workflow.png)
+
+ダイアログに入力する項目の説明を以下の表に示す。
+「Version number」と「Base image symbols」と「Image repository name」については、後述するディレクトリ構造におけるディレクトリ名と一致する必要がある。
+
+| 入力項目                  | 説明 | 入力値 |
+| ------------------------- | ---- | ------ |
+| Use workflow from         | どのブランチのワークフローを利用するか | 必ずmainを選択 |
+| Version number            | ビルドするExastro IT Automationのバージョン番号 | 例：1.8.1 |
+| Web UI Languages          | JSONの配列形式で表現した、Web UIで利用する言語群 | 例：["ja", "en"] |
+| Base image symbols        | JSONの配列形式で表現した、ベースイメージのシンボル群 | 例：[ "centos8", "ubi8"] |
+| Image repository name     | 作成するコンテナイメージのリポジトリ名。より正確には、リポジトリ名のパスの末尾の要素 | 例：it-automation |
+| Installer URL             | インストーラをダウンロードするためのURL。通常はバージョン番号をもとにリリースページのURLを構築するため、値は入力しない。リリースページ以外から取得する場合、例えばmainブランチのheadのアーカイブを利用する場合等に、そのURLを指定する | インストーラの.tar.gzがダウンロードできるURL |
+| Installer unpack dir name | インストーラの.tar.gzをアンパックした時に生成されるディレクトリ名。通常はリリースページからインストーラを取得するが、その場合はバージョン番号をもとにディレクトリ名が決定されるため、値は入力しない。リリースページ以外から取得する場合、例えばmainブランチのheadのアーカイブを利用する場合は`it-automation-main`のような別のディレクトリ名になるため、それを入力する | 入力例：it-automation-main |
 
 
 # コンテナレジストリ
@@ -95,36 +119,36 @@ Exastro IT Automationのコンテナイメージの構成は、All in One構成�
 ## リポジトリのディレクトリ構成
 
 プロジェクト`it-automation-container`のディレクトリ構成は次のように構成する。
-Exastro IT Automationのバージョン番号のディレクトリ`[VERSION]`の下に、作成するイメージの名前`[IMAGE_NAME]`のディレクトリを配置し、更にその下にベースイメージの名前に基づいたサブディレクトリ`[BASE_IMAGE]`を配置する。
+Exastro IT Automationのバージョン番号のディレクトリ`[VERSION]`の下に、作成するイメージのリポジトリ名`[IMAGE_REPO_NAME]`のディレクトリを配置し、更にその下にベースイメージの名前に基づいたサブディレクトリ`[BASE_IMAGE]`を配置する。
 これを図示すると、以下のようになる。
 
 ```
 it-automation-container
 |-- [VERSION]
-|   |-- [IMAGE_NAME]
+|   |-- [IMAGE_REPO_NAME]
 |   |   |-- [BASE_IMAGE]
 |   |   |-- [BASE_IMAGE]
 |   |   :
 |   |
-|   |-- [IMAGE_NAME]
+|   |-- [IMAGE_REPO_NAME]
 |   |   |-- [BASE_IMAGE]
 |   |   |-- [BASE_IMAGE]
 |   :   :
 |
 |-- [VERSION]
-|   |-- [IMAGE_NAME]
+|   |-- [IMAGE_REPO_NAME]
 |   |   |-- [BASE_IMAGE]
 |   |   |-- [BASE_IMAGE]
 |   |   :
 |   |
-|   |-- [IMAGE_NAME]
+|   |-- [IMAGE_REPO_NAME]
 |   |   |-- [BASE_IMAGE]
 |   |   |-- [BASE_IMAGE]
 :   :   :
 ```
 
 具体的な例を挙げると、以下のようなディレクトリ構成になる。
-ここでの例は架空のものであり、実在しないことに注意。
+ここでの例は架空であり、実在のものとは異なることに注意。
 
 ```
 it-automation-container
@@ -250,7 +274,7 @@ Exastro IT Automationのインストーラは、DBの初期化等のためにsys
 ```
 it-automation-container
 |-- [VERSION]
-|   |-- [IMAGE_NAME]
+|   |-- [IMAGE_REPO_NAME]
 |   |   |-- [BASE_IMAGE]
 |   |   |   |-- Makefile
 |   |   |   |-- Dockerfile
