@@ -1,4 +1,4 @@
-# リポジトリ`it-automation-container`のビルドとCI
+# リポジトリ`it-automation-container`のビルドとCIの方式
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -28,8 +28,12 @@
 
 # はじめに
 
-このドキュメントでは、`it-automation-container`を利用したExastro IT AutomationのコンテナのビルドとCIについて説明する。
-そのため、ビルドされたコンテナの仕様や利用方法は、このドキュメントの範疇外とする。
+このドキュメントでは、リポジトリ`it-automation-container`を利用したExastro IT AutomationのコンテナのビルドとCIの方式について説明する。
+そのため、以下の内容についてはこのドキュメントの範疇外であり、基本的には説明はしない。
+
+  * GitHubの操作手順
+  * ビルド環境の運用手順
+  * Exastro IT Automationのコンテナの仕様や利用方法
 
 
 # CI (Continuous Integration)
