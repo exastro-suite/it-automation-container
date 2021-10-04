@@ -264,7 +264,7 @@ services:
     ports:
       - "8080:80"
       - "10443:443"
-    restart: always
+    restart: on-failure
     volumes:
       - exastro-database:/exastro-database-volume
       - exastro-file:/exastro-file-volume
@@ -276,10 +276,14 @@ volumes:
     name: exastro-file-volume
 ```
 
-  - Docker Composeの起動  
+上記の`docker-compose.yml`の例では、コンテナ内のマウントポイント`/exastro-database-volume`と`/exastro-file-volume`に、それぞれ`exastro-database`と`exastro-file`というボリュームをマウントすることで、データの永続化を実現しています。
+
+この`docker-compose.yml`を利用してコンテナを実行するためには、以下のコマンドを実行します。
+
 ```
-    # docker-compose up -d
+# docker-compose up -d
 ```
+
 
 # 参考
 
