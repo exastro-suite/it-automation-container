@@ -258,27 +258,27 @@ Docker Composeは、コンテナを定義し実行するDockerアプリケーシ
 docker-compose.ymlの設定例  
 
 ```
-version: "3"  #composeのファイルフォーマット
-services:  
-  exastro:  #任意のサービス名
-    image: exastro/it-automation:1.8.0-ja  #指定するイメージ名
-    container_name: exastro01  #任意のコンテナ名
-    privileged: true  
-    extra_hosts:  
-      - "exastro-it-automation:127.0.0.1"   #イメージのタグ名
-    ports:  
-      - "8080:80"  #任意の公開用ポート:httpのポート
-      - "10443:443"  #任意の公開用ポート:httpsのポート
-    restart: always  
-    volumes:  
-      - exastro-database:/exastro-database-volume  #ホストOSのボリューム名:マウントするコンテナ内のパス
-      - exastro-file:/exastro-file-volume  #ホストOSのボリューム名:マウントするコンテナ内のパス
+version: "3.8"
+services:
+  exastro:
+    image: exastro/it-automation:1.8.0-ja
+    container_name: it-automation
+    privileged: true
+    extra_hosts:
+      - "exastro-it-automation:127.0.0.1"
+    ports:
+      - "8080:80"
+      - "10443:443"
+    restart: always
+    volumes:
+      - exastro-database:/exastro-database-volume
+      - exastro-file:/exastro-file-volume
 
-volumes:  
-  exastro-database:  
-    name: exastro-database-volume   #実際のボリューム名
-  exastro-file:  
-    name: exastro-file-volume   #実際のボリューム名
+volumes:
+  exastro-database:
+    name: exastro-database-volume
+  exastro-file:
+    name: exastro-file-volume
 ```
 
   - Docker Composeの起動  
