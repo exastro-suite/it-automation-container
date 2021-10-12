@@ -56,87 +56,109 @@ Exastro IT Automationのコンテナイメージは、[DockerHubで公開](https
 
 # 3. データの永続化
 
-コンテナを削除した場合、コンテナ内に保存されていたデータも削除されます。
-コンテナを削除した後も、コンテナ内のデータを残したい場合は、対象データをコンテナ外に保存(データの永続化)する必要があります。
-その為の手段として、「名前付きボリューム」、「バインドマウント」を使用する方法があります。
-今回は、コンテナ作成時にExastro連携で使用するデータをホストOS上に外出し、コンテナを再作成した際に
-削除前のデータを継続して利用する方法について記載します。
+アップデート等を目的として、コンテナを削除して再作成するのは、よくある作業のひとつです。
+しかしながら、コンテナを削除するとコンテナ内に保存されていたデータも削除されてしまうため、注意が必要です。
+コンテナを削除した後もデータを残しておきたい場合は、対象データをコンテナ外に保存(データの永続化)する必要があります。
 
-2.1 名前付きボリュームの利用  
-ホストOSのDocker管理領域に名前付きボリュームを作成し、コンテナの特定領域にマウントします。
-名前付きボリュームは、コンテナを削除した場合でもデータが保持されます。
+データをコンテナ外に永続化する方法は、以下の2つあります。
+  
+  * ボリュームを利用
+  * バインドマウントを利用
+  
+ここでは、Exastro IT Automationが利用するデータについて、上記2つの方法でコンテナ外に永続化する方法について記載します。
 
-  - 名前付きボリュームを作成する。  
+## 3.1 Exastro IT Automationのデータの保存場所
+
+コンテナ版のExastro IT Automation Ver.1.8.0以降では、データの保存場所を以下の2か所に集約しています。
+
+| パス                     | 説明                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| /exastro-file-volume     | Exastroが管理するデータファイルを保存。具体的には、作成したメニューや、アップロードしたファイル等 |
+| /exastro-database-volume | MariaDBのデータベースファイルを保存                                                               |
+
+この2か所に対して、ボリュームをマウントしたり、バインドマウントしたりすることで、データを永続化することができます。
 
 
-  - dockerコマンドの入力例  
+## 3.2 ボリュームを利用した永続化
+
+Dockerには「ボリューム(volume)」と呼ばれる、データを保存する領域を管理する機能があります。
+ボリュームはコンテナとは独立して作成と削除が可能であり、そのためコンテナを削除した後でもデータを残しておくことができます。
+
+ここでは、データファイルの保存先として`exastro-file`という名前のボリュームを、またMariaDBのデータベースファイルの保存先として`exastro-database`という名前の、2つのボリュームを利用する例を示します。
+
+まずは、以下のコマンドを実行してボリュームを作成します。
 
 ```
-    # docker volume create --name 【ITAのデータベース用ボリューム名】  
-    # docker volume create --name 【ITAのファイル用ボリューム名】
+$ docker volume create --name exastro-database
+$ docker volume create --name exastro-file
 ```
 
-  - podmanコマンドの入力例  
+次に、コンテナの起動オプションに`--volume`を指定して、ボリュームをコンテナのファイルシステムにマウントします。
+以下のコマンドは、ボリューム`exastro-file`をコンテナ内の`/exastro-file-volume`に、またボリューム`exastro-database`をコンテナ内の`/exastro-database-volume`にマウントした状態でコンテナを起動する例です。
 
 ```
-    # podman volume create  【ITAのデータベース用ボリューム名】  
-    # podman volume create  【ITAコンテナのファイル用ボリューム名】
-```
-
-  - コンテナ作成、起動し、作成した名前付きボリュームにマウントする。docker run 実施時に、オプション-v 【ホストOSのボリューム】:【コンテナのディレクトリパス】で指定した際に、コンテナのディレクトリパス配下のディレクトリ、ファイルが、ホストOSのボリュームに自動でコピー、マウントされます。  
-
-```
-# docker run \
+$ docker run \
     --name it-automation \
     --privileged \
     --add-host=exastro-it-automation:127.0.0.1 \
-    -v 【ITAコンテナのデータベース用ボリューム名】:/exastro-database-volume \
-    -v 【ITAコンテナのファイル用ボリューム名】:/exastro-file-volume \
+    --volume exastro-file:/exastro-file-volume \
+    --volume exastro-database:/exastro-database-volume \
     -d \
     -p 8080:80 \
     -p 10443:443 \
-    exastro/it-automation:1.8.0-ja  
+    exastro/it-automation:1.8.0-ja
 ```
 
-2.2 バインドマウントの利用  
-ホストOS上のファイルやディレクトリをコンテナにマウントします。
-「バインドマウント」を使用する場合、ホストマシンのファイルシステムに依存するものとなり、利用可能な特定のディレクトリ構造に従ったものになります。  
+この時、dockerが「新規に作成されたボリュームの初回利用」であると検知した場合は、マウント先にもともと存在していたファイルは、マウントするボリュームに自動的にコピーされます。
+従って、特段の追加作業なしに、ボリュームを利用することができます。
 
 
-  - ITAコンテナ用のバインドマウントするディレクトリを作成する。  
+## 3.3 バインドマウントの利用
 
-```
-  # mkdir -p -m 777 /【任意のパス】/exastro-ita/files  
-  # mkdir -p -m 777 /【任意のパス】/exastro-ita/database
-```
+バインドマウントは、ホストマシンのディレクトリを直接コンテナにマウントする方法です。
+ここでは、データファイルの保存先として`/exastro-file`というディレクトリを、またMariaDBのデータベースファイルの保存先として` /exastro-database`というディレクトリを利用する例を示します。
 
-  - コンテナを起動する。  
-  
-    - 初回実施の動作  
-コンテナ作成、起動、ITA連携データをホストOSのディレクトリにコピーし、作成したディレクトリにバインドマウントします。また、「/【任意のパス】/exastro-ita/database/」、「/【任意のパス】/exastro-ita/files/」の配下に.initialized(初回作成の判定ファイル)が作成されます。  
-
-    - 初回実施後にデータを引き継いで、コンテナを再作成する場合  
-2回目以降にコマンドを実施した場合は、.initialized(初回作成の判定ファイル)が存在する為、ITA連携データのマウント先である、ホストOSのディレクトリは、初期化されません。  
-また、コマンド実行時に、--envオプションを指定しない場合は、.initialized(初回作成の判定ファイル)の有無に関係なく、初期化されません。  
-
-    - 初回実施後に初期化して、コンテナを再作成する場合  
-.initialized(初回作成の判定ファイル)を削除した状態でコマンド(--envオプションを含む)を実施する。  
-※必要データが存在する場合は、実施前に退避を行ってください。
+事前準備として、以下のコマンドを実行して、バインドマウントするディレクトリをホストマシン上に作成しておきます。
 
 ```
-# docker run \
+$ sudo mkdir -m 777 /exastro-file
+$ sudo mkdir -m 777 /exastro-database
+```
+
+次に、コンテナの起動オプションに`--volume`を指定して、ホストマシン上のディレクトリをコンテナのファイルシステムにマウントします。
+以下のコマンドは、ホストマシン上のディレクトリ`/exastro-file`をコンテナ内の`/exastro-file-volume`に、またホストマシン上のディレクトリ`/exastro-database`をコンテナ内の`/exastro-database-volume`にマウントした状態でコンテナを起動する例です。
+
+```
+$ docker run \
     --name it-automation \
     --privileged \
     --add-host=exastro-it-automation:127.0.0.1 \
-    --volume /【任意のパス】/exastro-ita/files:/exastro-file-volume \
+    --volume /exastro-file:/exastro-file-volume \
     --env EXASTRO_AUTO_FILE_VOLUME_INIT=true \
-    --volume /【任意のパス】/exastro-ita/database:/exastro-database-volume  \
+    --volume /exastro-database/database:/exastro-database-volume  \
     --env EXASTRO_AUTO_DATABASE_VOLUME_INIT=true \
     -d \
     -p 8080:80 \
     -p 10443:443 \
-    exastro/it-automation:1.8.0-ja  
+    exastro/it-automation:1.8.0-ja
 ```
+
+ここで注意点ですが、ボリュームのマウントとは異なり、バインドマウントの場合はdocker自体にはマウント先のファイルをマウント元に自動的にコピーする機能がありません。
+そのため、Exastro IT Automationのコンテナイメージには、マウントされたディレクトリの初回利用時にそのディレクトリを初期化する機能が実装されています。
+この機能をdockerのファイルコピー機能の代替として利用できます。
+
+この機能を利用するには、以下の2つの環境変数を設定してExastro IT Automationのコンテナを起動します。
+
+| 環境変数名                          | 既定値  | 説明                                                                                                         |
+| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------ |
+| `EXASTRO_AUTO_FILE_VOLUME_INIT`     | `false` | `true`の場合は初回のバインドマウント時に`/exastro-file-volume`を初期化する。`false`の場合は初期化しない。    |
+| `EXASTRO_AUTO_DATABASE_VOLUME_INIT` | `false` | `true`の場合は初回のバインドマウント時に`/exastro-database-volume`を初期化する。`false`の場合は初期化しない。|
+
+先に示したコンテナの実行例では、これらの環境変数を`true`に設定することで、ファイルの自動コピーを行っています。
+
+なおこの機能は、コンテナ内のディレクトリ`/exastro-file-volume`および`/exastro-database-volume`に`.initialized`というマーカーファイルが存在するかどうかで、初回利用時かどうかを判断しています。
+そのため、ファイル`.initialized`は削除しないでください。
+
 
 # 4. Systemdによるサービス化
 
@@ -270,9 +292,7 @@ services:
 
 volumes:
   exastro-database:
-    name: exastro-database-volume
   exastro-file:
-    name: exastro-file-volume
 ```
 
 上記の`docker-compose.yml`の例では、コンテナ内のマウントポイント`/exastro-database-volume`と`/exastro-file-volume`に、それぞれ`exastro-database`と`exastro-file`というボリュームをマウントすることで、データの永続化を実現しています。
