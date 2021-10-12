@@ -14,7 +14,7 @@
 
 Exastro IT Automationのコンテナイメージは、[DockerHubで公開](https://hub.docker.com/r/exastro/it-automation)しており、誰でも利用することができます。
 そのため、DockerやPodman等のコンテナランタイムさえあれば、特別な準備をすることなく簡単にExastro IT Automationを起動することができます。
-コンテナランタイムのインストール事前にインストールして下さい。
+以降の説明では、コンテナランタイムは事前にインストール済みであることを前提としています。
 
 では、さっそくコンテナ化されたExastro IT Automationを起動してみます。コンテナランタイムがインストールされているLinuxマシンにログインし、以下のコマンドを実行してください。  
 ※podmanコマンドを使用する場合は、dockerの部分をpodmanに置き換えて実施可能です。(一部オプションの指定方法が異なる場合があります)  
