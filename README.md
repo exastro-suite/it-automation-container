@@ -89,8 +89,8 @@ Dockerには「ボリューム(volume)」と呼ばれる、データを保存す
 まずは、以下のコマンドを実行してボリュームを作成します。
 
 ```
-$ docker volume create --name exastro-database
 $ docker volume create --name exastro-file
+$ docker volume create --name exastro-database
 ```
 
 次に、コンテナの起動オプションに`--volume`を指定して、ボリュームをコンテナのファイルシステムにマウントします。
