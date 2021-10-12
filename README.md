@@ -256,7 +256,7 @@ Docker Composeを利用することで、毎回複雑な起動オプションを
 version: "3.8"
 services:
   exastro:
-    image: exastro/it-automation:1.8.0-ja
+    image: exastro/it-automation:1.8.1-ja
     container_name: it-automation
     privileged: true
     extra_hosts:
@@ -264,7 +264,6 @@ services:
     ports:
       - "8080:80"
       - "10443:443"
-    restart: on-failure
     volumes:
       - exastro-database:/exastro-database-volume
       - exastro-file:/exastro-file-volume
