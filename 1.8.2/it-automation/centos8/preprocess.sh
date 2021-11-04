@@ -102,8 +102,9 @@ dnf install -y diffutils procps which openssl
 
 
 ##############################################################################
-# install web related packages
+# install required packages
 
+dnf install -y rsyslog  # for writing /var/log/messages
 dnf install -y hostname # apache ssl needs hostname command
 
 
