@@ -98,7 +98,7 @@ timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]
 ##############################################################################
 # install common packages (installer requirements)
 
-dnf install -y diffutils procps openssl
+dnf install -y diffutils procps which openssl
 
 
 ##############################################################################
