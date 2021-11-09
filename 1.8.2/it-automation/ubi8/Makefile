@@ -30,6 +30,11 @@ IMAGE_FULL_NAME := $(IMAGE_HOST_AND_PATH)$(IMAGE_NAME):$(EXASTRO_ITA_VER)-$(EXAS
 # Builder container
 BUILDER_CONTAINER_NAME := $(IMAGE_NAME)-$(EXASTRO_ITA_VER)-$(EXASTRO_ITA_LANG)-$(DISTRO_SYMBOL)-builder
 
+# Extra root CA
+ifneq ($(origin EXASTRO_EXTRA_ROOT_CA), undefined)
+DOCKER_BUILD_OPT_SECRET := --secret id=extra-root-ca,src=$(EXASTRO_EXTRA_ROOT_CA)
+endif
+
 # Preprocess
 EXASTRO_ITA_INSTALLER_URL ?= https://github.com/exastro-suite/it-automation/releases/download/v$(EXASTRO_ITA_VER)/exastro-it-automation-$(EXASTRO_ITA_VER).tar.gz
 EXASTRO_ITA_UNPACK_BASE_DIR ?= /root
@@ -68,9 +73,11 @@ clean:
 
 .PHONY: build
 build:
-	docker build \
+	DOCKER_BUILDKIT=1 docker build \
 		--tag $(IMAGE_FULL_NAME) \
+		--no-cache \
 		--build-arg EXASTRO_ITA_VER=$(EXASTRO_ITA_VER) \
+		$(DOCKER_BUILD_OPT_SECRET) \
 		./
 
 	docker run \
@@ -85,6 +92,12 @@ build:
 
 	docker exec \
 		--tty \
+		--env HTTP_PROXY \
+		--env http_proxy \
+		--env HTTPS_PROXY \
+		--env https_proxy \
+		--env NO_PROXY \
+		--env no_proxy \
 		--env EXASTRO_ITA_INSTALLER_URL=$(EXASTRO_ITA_INSTALLER_URL) \
 		--env EXASTRO_ITA_UNPACK_BASE_DIR=$(EXASTRO_ITA_UNPACK_BASE_DIR) \
 		--env EXASTRO_ITA_UNPACK_DIR=$(EXASTRO_ITA_UNPACK_DIR) \
@@ -93,12 +106,24 @@ build:
 
 	docker exec \
 		--tty \
+		--env HTTP_PROXY \
+		--env http_proxy \
+		--env HTTPS_PROXY \
+		--env https_proxy \
+		--env NO_PROXY \
+		--env no_proxy \
 		--workdir=$(EXASTRO_ITA_UNPACK_DIR)/ita_install_package/install_scripts \
 		$(BUILDER_CONTAINER_NAME) \
 		/bin/sh -x ita_installer.sh
 
 	docker exec \
 		--tty \
+		--env HTTP_PROXY \
+		--env http_proxy \
+		--env HTTPS_PROXY \
+		--env https_proxy \
+		--env NO_PROXY \
+		--env no_proxy \
 		$(BUILDER_CONTAINER_NAME) \
 		/root/postprocess.sh
 
