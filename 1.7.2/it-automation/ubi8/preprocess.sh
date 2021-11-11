@@ -137,7 +137,7 @@ find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 
 
 
 ##############################################################################
-# install ainsible related packages
+# install ansible related packages
 
 dnf install -y --enablerepo=epel sshpass
 
