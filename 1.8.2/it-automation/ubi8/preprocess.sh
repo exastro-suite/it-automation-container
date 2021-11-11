@@ -30,7 +30,7 @@ declare -A EXASTRO_ITA_LANG_TABLE=(
 )
 
 declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
-    ["en"]="C.utf-8"
+    ["en"]="C.UTF-8"
     ["ja"]="ja_JP.UTF-8"
 )
 
@@ -108,10 +108,20 @@ dnf config-manager --disable epel epel-modular
 
 
 ##############################################################################
-# Set system locale and system timezone
+# Set system locale
 
-#dnf -y --enablerepo=appstream install langpacks-"$EXASTRO_ITA_LANG"
-#localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+dnf install -y glibc-locale-source
+
+/usr/bin/localedef \
+    -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
+    -f `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=2` \
+    "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# Set system timezone
 
 timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
 

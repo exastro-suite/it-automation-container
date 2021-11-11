@@ -29,6 +29,11 @@ declare -A EXASTRO_ITA_LANG_TABLE=(
     ["ja"]="ja_JP"
 )
 
+declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
+    ["en"]="C.UTF-8"
+    ["ja"]="ja_JP.UTF-8"
+)
+
 declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
     ["en"]="UTC"
     ["ja"]="Asia/Tokyo"
@@ -79,7 +84,19 @@ dnf update -y
 # dnf and repository configuration
 
 dnf install -y dnf-plugins-core
-#dnf config-manager --enable powertools
+
+
+##############################################################################
+# Set system locale
+
+dnf install -y glibc-locale-source
+
+/usr/bin/localedef \
+    -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
+    -f `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=2` \
+    "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
 
 
 ##############################################################################
