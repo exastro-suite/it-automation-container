@@ -89,7 +89,7 @@ dnf install -y dnf-plugins-core
 ##############################################################################
 # Set system locale
 
-dnf install -y glibc-locale-source
+dnf install -y glibc-common
 
 /usr/bin/localedef \
     -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
