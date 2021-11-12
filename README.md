@@ -315,7 +315,7 @@ volumes:
 | /exastro /data_relay_storage/symphony | /exastro-file-volume/data_relay_storage/symphony |
 | /exastro /data_relay_storage/conductor |  /exastro-file-volume/data_relay_storage/conductor |
 | /exastro /data_relay_storage/ansible_driver |  /exastro-file-volume/data_relay_storage/ansible_driver |
-| /exastro /ita_sessions | /exastro-file-volume/ita_sessionsr |
+| /exastro /ita_sessions | /exastro-file-volume/ita_sessions |
 | /exastro /ita-root/temp | /exastro-file-volume/ita-root/temp |
 | /exastro /ita-root/uploadfiles  | /exastro-file-volume/ita-root/uploadfiles |
 | /exastro /ita-root/webroot/uploadfiles | /exastro-file-volume/ita-root/webroot/uploadfiles |
