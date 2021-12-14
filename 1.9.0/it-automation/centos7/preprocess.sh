@@ -66,7 +66,7 @@ hostgroup:yes
 ansible_driver:yes
 cobbler_driver:no
 terraform_driver:yes
-cicd_for_iac:no
+cicd_for_iac:yes
 ita_domain:exastro-it-automation.local
 certificate_path:
 private_key_path:
