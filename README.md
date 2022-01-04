@@ -135,7 +135,7 @@ $ docker run \
     --add-host=exastro-it-automation:127.0.0.1 \
     --volume /exastro-file:/exastro-file-volume \
     --env EXASTRO_AUTO_FILE_VOLUME_INIT=true \
-    --volume /exastro-database/database:/exastro-database-volume  \
+    --volume /exastro-database:/exastro-database-volume  \
     --env EXASTRO_AUTO_DATABASE_VOLUME_INIT=true \
     -d \
     -p 8080:80 \
