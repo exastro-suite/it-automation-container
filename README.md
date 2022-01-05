@@ -89,15 +89,15 @@ Dockerには「ボリューム(volume)」と呼ばれる、データを保存す
 まずは、以下のコマンドを実行してボリュームを作成します。
 
 ```
-$ docker volume create --name exastro-file
-$ docker volume create --name exastro-database
+# docker volume create --name exastro-file
+# docker volume create --name exastro-database
 ```
 
 次に、コンテナの起動オプションに`--volume`を指定して、ボリュームをコンテナのファイルシステムにマウントします。
 以下のコマンドは、ボリューム`exastro-file`をコンテナ内の`/exastro-file-volume`に、またボリューム`exastro-database`をコンテナ内の`/exastro-database-volume`にマウントした状態でコンテナを起動する例です。
 
 ```
-$ docker run \
+# docker run \
     --name it-automation \
     --privileged \
     --add-host=exastro-it-automation:127.0.0.1 \
@@ -121,15 +121,15 @@ $ docker run \
 事前準備として、以下のコマンドを実行して、バインドマウントするディレクトリをホストマシン上に作成しておきます。
 
 ```
-$ sudo mkdir -m 777 /exastro-file
-$ sudo mkdir -m 777 /exastro-database
+# sudo mkdir -m 777 /exastro-file
+# sudo mkdir -m 777 /exastro-database
 ```
 
 次に、コンテナの起動オプションに`--volume`を指定して、ホストマシン上のディレクトリをコンテナのファイルシステムにマウントします。
 以下のコマンドは、ホストマシン上のディレクトリ`/exastro-file`をコンテナ内の`/exastro-file-volume`に、またホストマシン上のディレクトリ`/exastro-database`をコンテナ内の`/exastro-database-volume`にマウントした状態でコンテナを起動する例です。
 
 ```
-$ docker run \
+# docker run \
     --name it-automation \
     --privileged \
     --add-host=exastro-it-automation:127.0.0.1 \
