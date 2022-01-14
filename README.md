@@ -27,7 +27,7 @@ Exastro IT Automationのコンテナイメージは、[DockerHubで公開](https
     -d \
     -p 8080:80 \
     -p 10443:443 \
-    docker.io/exastro/it-automation:1.9.0-ja
+    exastro/it-automation:1.9.0-ja
 ```
 
 これでExastro IT Automationの起動が完了しました。
@@ -106,7 +106,7 @@ Dockerには「ボリューム(volume)」と呼ばれる、データを保存す
     -d \
     -p 8080:80 \
     -p 10443:443 \
-    docker.io/exastro/it-automation:1.9.0-ja
+    exastro/it-automation:1.9.0-ja
 ```
 
 この時、dockerが「新規に作成されたボリュームの初回利用」であると検知した場合は、マウント先にもともと存在していたファイルは、マウントするボリュームに自動的にコピーされます。
@@ -140,7 +140,7 @@ Dockerには「ボリューム(volume)」と呼ばれる、データを保存す
     -d \
     -p 8080:80 \
     -p 10443:443 \
-    docker.io/exastro/it-automation:1.9.0-ja
+    exastro/it-automation:1.9.0-ja
 ```
 
 ここで注意点ですが、ボリュームのマウントとは異なり、バインドマウントの場合はdocker自体にはマウント先のファイルをマウント元に自動的にコピーする機能がありません。
@@ -190,7 +190,7 @@ systemdで、コンテナ作成、起動、停止(削除)を制御する場合
               -p 8080:80 \
               -p 10443:443 \
               --name exastro01 \
-              docker.io/exastro/it-automation:1.9.0-ja
+              exastro/it-automation:1.9.0-ja
  ExecStop=/usr/bin/docker stop exastro01
  RemainAfterExit=yes
 [Install]
@@ -278,7 +278,7 @@ Docker Composeを利用することで、毎回複雑な起動オプションを
 version: "3.8"
 services:
   exastro:
-    image: docker.io/exastro/it-automation:1.9.0-ja
+    image: exastro/it-automation:1.9.0-ja
     container_name: it-automation
     privileged: true
     extra_hosts:
