@@ -5,7 +5,7 @@ on:
       EXASTRO_ITA_VER:
         description: Version number
         required: true
-        default: '1.8.2'
+        default: '1.9.1'
         
       EXASTRO_ITA_LANG:
         description: Web UI Languages
@@ -15,7 +15,7 @@ on:
       DISTRO_SYMBOL:
         description: Base image symbols
         required: true
-        default: '["ubi8", "centos8", "centos7"]'
+        default: '["ubi8", "almalinux8", "centos7"]'
         
       IMAGE_NAME:
         description: Image repository name

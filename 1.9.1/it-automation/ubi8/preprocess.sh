@@ -84,16 +84,16 @@ dnf update -y
 
 cat << 'EOS' > /etc/yum.repos.d/centos8.repo
 [baseos]
-name=CentOS Linux $releasever - BaseOS
-mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=BaseOS&infra=$infra
-#baseurl=http://mirror.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/
+name=AlmaLinux $releasever - BaseOS
+mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/baseos
+# baseurl=https://repo.almalinux.org/almalinux/$releasever/BaseOS/$basearch/os/
 gpgcheck=0
 enabled=0
 
 [appstream]
-name=CentOS Linux $releasever - AppStream
-mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=AppStream&infra=$infra
-#baseurl=http://mirror.centos.org/$contentdir/$releasever/AppStream/$basearch/os/
+name=AlmaLinux $releasever - AppStream
+mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/appstream
+# baseurl=https://repo.almalinux.org/almalinux/$releasever/AppStream/$basearch/os/
 gpgcheck=0
 enabled=0
 EOS
