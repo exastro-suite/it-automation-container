@@ -265,7 +265,7 @@ ITAのデフォルトで使用している自己証明書ではなく、独自�
     # docker exec -it exastro01 /bin/bash  
 ```
 
-マニュアル  https://exastro-suite.github.io/it-automation-docs/learn_ja.html#install_distributed_ha
+マニュアル  https://exastro-suite.github.io/it-automation-docs/install_ja.html#install_distributed_ha
 
 
 # 6. Docker Composeの活用
