@@ -66,3 +66,7 @@ systemctl stop mariadb
 # move, link and archive
 move_and_link_and_archive "/exastro" "/exastro-file-volume" "${EXASTRO_FILE_VOLUME_CONTENT_PATHS[@]}"
 move_and_link_and_archive "/var/lib" "/exastro-database-volume" "${EXASTRO_DATABASE_VOLUME_CONTENT_PATHS[@]}"
+
+# Certificate delete
+rm -f /etc/pki/tls/certs/exastro-it-automation.local.crt
+rm -f /etc/pki/tls/certs/exastro-it-automation.local.key
