@@ -1,3 +1,6 @@
+
+[English](README.en.md) | 日本語
+
 # Exastro IT Automationのコンテナの運用
 
 本ドキュメントでは、コンテナ技術を利用してExastro IT Automationの運用を行うための、考え方と手順を解説します。
