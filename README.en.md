@@ -1,3 +1,5 @@
+English | [日本語](README.md)
+
 # Using Exastro IT Automation's Container
 
 This document uses the  explains the process of using the Exastro IT Automation container.
