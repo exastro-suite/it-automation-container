@@ -128,13 +128,6 @@ dnf install -y --enablerepo=appstream telnet
 
 
 ##############################################################################
-# Python interpreter warning issue (container only)
-#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
-
-find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
-
-
-##############################################################################
 # install ansible related packages
 
 dnf install -y --enablerepo=epel sshpass
@@ -160,7 +153,7 @@ dnf install -y --enablerepo=appstream boost-program-options libpmem
 curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
 
 # No.3 ITAのインストール資材を展開する
-cd ${EXASTRO_ITA_UNPACK_BASE_DIR}
+cd ${EXASTRO_ITA_UNPACK_DIR}
 find ${EXASTRO_ITA_UNPACK_DIR} -type f | xargs -I{} sed -i -e "s:%%%%%ITA_DIRECTORY%%%%%:${EXASTRO_ITA_INSTALL_DIR}:g" {}
 
 
@@ -368,3 +361,4 @@ for SHARED_DIR in ${SHARED_DIRS[@]}; do
     rm -rf ${EXASTRO_ITA_INSTALL_DIR}/${SHARED_DIR}
     ln -s /exastro-file-volume/${SHARED_DIR} ${EXASTRO_ITA_INSTALL_DIR}/${SHARED_DIR}
 done
+

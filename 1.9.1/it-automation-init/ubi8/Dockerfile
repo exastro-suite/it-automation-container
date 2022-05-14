@@ -1,3 +1,18 @@
+##############################################################################
+# Global arguments
+
+ARG EXASTRO_ITA_VOLUME_ARCHIVE
+
+
+##############################################################################
+# Volume archive
+
+FROM ${EXASTRO_ITA_VOLUME_ARCHIVE} AS volume-archive
+
+
+##############################################################################
+# Exastro IT Automation - init
+
 FROM registry.access.redhat.com/ubi8/ubi
 
 ARG EXASTRO_ITA_VER
@@ -18,7 +33,7 @@ if [ -f /run/secrets/extra-root-ca ]; then \
 fi
 
 # Required Licenses
-COPY exastro-initial-volume-archive/ /exastro-initial-volume-archive/
+COPY --from=volume-archive /exastro-initial-volume-archive/ /exastro-initial-volume-archive/
 
 # Entrypoint script
 COPY docker-entrypoint.sh /

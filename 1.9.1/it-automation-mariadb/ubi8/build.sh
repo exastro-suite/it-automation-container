@@ -1,9 +1,43 @@
 #!/bin/bash -ex
 
 ##############################################################################
-# Download Exastro IT Automation Installer
+# Check required environment variables
 
-curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+REQUIRED_ENV_VARS=(
+    EXASTRO_ITA_VER
+    EXASTRO_ITA_LANG
+    EXASTRO_ITA_INSTALLER_URL
+    EXASTRO_ITA_UNPACK_BASE_DIR
+    EXASTRO_ITA_UNPACK_DIR
+)
+
+for VAR in "${REQUIRED_ENV_VARS[@]}"; do
+    if [ -v ${VAR} ]; then
+        echo "${VAR}=${!VAR}"
+    else
+        echo "Required environment variable $VAR is not defined."
+        exit 1
+    fi
+done
+
+
+##############################################################################
+# Tables
+
+declare -A EXASTRO_ITA_LANG_TABLE=(
+    ["en"]="en_US"
+    ["ja"]="ja_JP"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
+    ["en"]="C.UTF-8"
+    ["ja"]="ja_JP.UTF-8"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
+    ["en"]="UTC"
+    ["ja"]="Asia/Tokyo"
+)
 
 
 ##############################################################################
@@ -13,9 +47,7 @@ dnf update -y
 
 
 ##############################################################################
-# Build
-##############################################################################
-# DNF repository (ubi8)
+# DNF repository
 
 cat << 'EOS' > /etc/yum.repos.d/centos8.repo
 [baseos]
@@ -24,6 +56,7 @@ mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/baseos
 # baseurl=https://repo.almalinux.org/almalinux/$releasever/BaseOS/$basearch/os/
 gpgcheck=0
 enabled=0
+
 [appstream]
 name=AlmaLinux $releasever - AppStream
 mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/appstream
@@ -34,55 +67,70 @@ EOS
 
 
 ##############################################################################
-# dnf and repository configuration (ubi8)
+# dnf and repository configuration
+
 dnf install -y dnf-plugins-core
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf config-manager --disable epel epel-modular
 
 
 ##############################################################################
-# install common packages (installer requirements) (ubi8)
+# Set system locale
+
+if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
+    dnf install -y glibc-locale-source
+    
+    /usr/bin/localedef \
+        -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
+        -f `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=2` \
+        "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+fi
+
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# Set system timezone
+
+timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# Reinstall "langpacks-en" to repare the corrupted language packs that causes
+# garbled file name of exported Excel files.
+
+dnf -y --enablerepo=appstream reinstall langpacks-en
+
+
+##############################################################################
+# install common packages (installer requirements)
 
 dnf install -y diffutils procps which openssl
 dnf install -y --enablerepo=baseos expect
 
 
 ##############################################################################
-# install required packages (ubi8)
+# install required packages
 
 dnf install -y rsyslog  # for writing /var/log/messages
-dnf install -y hostname
+dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
 
 
 ##############################################################################
-# install ansible related packages (ubi8)
+# install ansible related packages
 
 dnf install -y --enablerepo=epel sshpass
 
 
 ##############################################################################
-# install MariaDB related packages (ubi8)
+# install MariaDB related packages
 #   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
 #   note: MariaDB 10.6 requires libpmem
 
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
-
-
-##############################################################################
-# Set system locale and system timezone
-dnf install -y glibc-locale-source
-/usr/bin/localedef -i ja_JP -f UTF-8 ja_JP.UTF-8
-localectl set-locale LANG=ja_JP.UTF-8
-timedatectl set-timezone Asia/Tokyo
-
-
-##############################################################################
-# Reinstall "langpacks-en" to repare the corrupted language packs that causes
-# garbled file name of exported Excel files.
-dnf -y --enablerepo=appstream reinstall langpacks-en
 
 
 ##############################################################################
@@ -118,6 +166,8 @@ find ${EXASTRO_ITA_UNPACK_DIR} -type f | xargs -I{} sed -i -e "s:%%%%%ITA_DIRECT
 
 ##############################################################################
 # MariaDBインストール
+#  No need to initialize MariaDB database because of providing database
+#  files via database volume. So some steps are skipped.
 
 # No.7 MariaDBをインストールする
 curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
@@ -186,6 +236,8 @@ cp -p ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/ext_files_for_CentOS8.x/etc_
 # No.16 MariaDBのユーザを作成する
 # No.17 ITA用DBを作成する
 # No.18 ユーザの権限を設定する
+#  Note: No need to initialize MariaDB database, because of providing database files via database volume.
+
 #cat << EOS > /tmp/create-db-and-user_for_MySQL.sql
 #CREATE USER 'ITA_USER' IDENTIFIED BY 'ITA_PASSWD';
 #CREATE USER 'ITA_USER'@'localhost' IDENTIFIED BY 'ITA_PASSWD';

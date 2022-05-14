@@ -37,6 +37,9 @@ ifneq ($(origin EXASTRO_EXTRA_ROOT_CA), undefined)
 DOCKER_BUILD_OPT_SECRET := --secret id=extra-root-ca,src=$(EXASTRO_EXTRA_ROOT_CA)
 endif
 
+# Volume archive
+EXASTRO_ITA_VOLUME_ARCHIVE := $(IMAGE_HOST_AND_PATH)it-automation:$(EXASTRO_ITA_VER)-$(EXASTRO_ITA_LANG)-$(DISTRO_SYMBOL)
+
 
 ##############################################################################
 # Targets
@@ -53,6 +56,7 @@ build:
 		--tag $(IMAGE_FULL_NAME) \
 		--no-cache \
 		--build-arg EXASTRO_ITA_VER=$(EXASTRO_ITA_VER) \
+		--build-arg EXASTRO_ITA_VOLUME_ARCHIVE=$(EXASTRO_ITA_VOLUME_ARCHIVE) \
 		$(DOCKER_BUILD_OPT_SECRET) \
 		./
 

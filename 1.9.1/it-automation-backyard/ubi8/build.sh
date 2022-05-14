@@ -1,9 +1,53 @@
 #!/bin/bash -ex
 
 ##############################################################################
-# Download Exastro IT Automation Installer
+# Check required environment variables
 
-curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+REQUIRED_ENV_VARS=(
+    EXASTRO_ITA_VER
+    EXASTRO_ITA_LANG
+    EXASTRO_ITA_INSTALLER_URL
+    EXASTRO_ITA_UNPACK_BASE_DIR
+    EXASTRO_ITA_UNPACK_DIR
+)
+
+for VAR in "${REQUIRED_ENV_VARS[@]}"; do
+    if [ -v ${VAR} ]; then
+        echo "${VAR}=${!VAR}"
+    else
+        echo "Required environment variable $VAR is not defined."
+        exit 1
+    fi
+done
+
+
+##############################################################################
+# Constants
+
+# for SSL certificate
+EXASTRO_ITA_DOMAIN=exastro-it-automation.local
+CERTIFICATE_FILE=${EXASTRO_ITA_DOMAIN}.crt
+PRIVATE_KEY_FILE=${EXASTRO_ITA_DOMAIN}.key
+CSR_FILE=${EXASTRO_ITA_DOMAIN}.csr
+
+
+##############################################################################
+# Tables
+
+declare -A EXASTRO_ITA_LANG_TABLE=(
+    ["en"]="en_US"
+    ["ja"]="ja_JP"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_LOCALE_TABLE=(
+    ["en"]="C.UTF-8"
+    ["ja"]="ja_JP.UTF-8"
+)
+
+declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
+    ["en"]="UTC"
+    ["ja"]="Asia/Tokyo"
+)
 
 
 ##############################################################################
@@ -13,9 +57,7 @@ dnf update -y
 
 
 ##############################################################################
-# Build
-##############################################################################
-# DNF repository (ubi8)
+# DNF repository
 
 cat << 'EOS' > /etc/yum.repos.d/centos8.repo
 [baseos]
@@ -24,6 +66,7 @@ mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/baseos
 # baseurl=https://repo.almalinux.org/almalinux/$releasever/BaseOS/$basearch/os/
 gpgcheck=0
 enabled=0
+
 [appstream]
 name=AlmaLinux $releasever - AppStream
 mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/appstream
@@ -34,55 +77,70 @@ EOS
 
 
 ##############################################################################
-# dnf and repository configuration (ubi8)
+# dnf and repository configuration
+
 dnf install -y dnf-plugins-core
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf config-manager --disable epel epel-modular
 
 
 ##############################################################################
-# install common packages (installer requirements) (ubi8)
+# Set system locale
+
+if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
+    dnf install -y glibc-locale-source
+    
+    /usr/bin/localedef \
+        -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
+        -f `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=2` \
+        "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+fi
+
+localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# Set system timezone
+
+timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# Reinstall "langpacks-en" to repare the corrupted language packs that causes
+# garbled file name of exported Excel files.
+
+dnf -y --enablerepo=appstream reinstall langpacks-en
+
+
+##############################################################################
+# install common packages (installer requirements)
 
 dnf install -y diffutils procps which openssl
 dnf install -y --enablerepo=baseos expect
 
 
 ##############################################################################
-# install required packages (ubi8)
+# install required packages
 
 dnf install -y rsyslog  # for writing /var/log/messages
-dnf install -y hostname
+dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
 
 
 ##############################################################################
-# install ansible related packages (ubi8)
+# install ansible related packages
 
 dnf install -y --enablerepo=epel sshpass
 
 
 ##############################################################################
-# install MariaDB related packages (ubi8)
+# install MariaDB related packages
 #   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
 #   note: MariaDB 10.6 requires libpmem
 
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
-
-
-##############################################################################
-# Set system locale and system timezone
-dnf install -y glibc-locale-source
-/usr/bin/localedef -i ja_JP -f UTF-8 ja_JP.UTF-8
-localectl set-locale LANG=ja_JP.UTF-8
-timedatectl set-timezone Asia/Tokyo
-
-
-##############################################################################
-# Reinstall "langpacks-en" to repare the corrupted language packs that causes
-# garbled file name of exported Excel files.
-dnf -y --enablerepo=appstream reinstall langpacks-en
 
 
 ##############################################################################
@@ -179,12 +237,6 @@ cp -rp ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/ITA/ita-contents/ita-root/ 
 # No.19 ITA設定ファイル配置
 mkdir -p ${EXASTRO_ITA_INSTALL_DIR}/ita-root/confs/
 cp -rp ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/ITA/ita-confs/* ${EXASTRO_ITA_INSTALL_DIR}/ita-root/confs/
-
-# ● セッション用ディレクトリ作成
-#mkdir -m 777 ${EXASTRO_ITA_INSTALL_DIR}/ita_sessions
-
-# ● data_relay_storageディレクトリ作成
-#mkdir ${EXASTRO_ITA_INSTALL_DIR}/data_relay_storage
 
 # No.20 ITAで使用するディレクトリ作成
 while read line
@@ -305,6 +357,7 @@ cat << EOS > /var/spool/cron/root
 02 00 * * * su - -c ${EXASTRO_ITA_INSTALL_DIR}/ita-root/backyards/common/ky_file_autoclean-workflow.sh
 EOS
 
+
 ##############################################################################
 # Install git
 
@@ -334,3 +387,4 @@ for SHARED_DIR in ${SHARED_DIRS[@]}; do
     rm -rf ${EXASTRO_ITA_INSTALL_DIR}/${SHARED_DIR}
     ln -s /exastro-file-volume/${SHARED_DIR} ${EXASTRO_ITA_INSTALL_DIR}/${SHARED_DIR}
 done
+
