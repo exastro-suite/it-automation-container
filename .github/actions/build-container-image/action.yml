@@ -1,11 +1,35 @@
 name: Echo shape and color
 
 inputs:
-  SHAPE:
+  EXASTRO_ITA_IMAGE_NAME:
+    description: Image name
     required: true
+    default: 'it-automation'
 
-  COLOR:
+  EXASTRO_ITA_VER:
+    description: Version number
     required: true
+    default: '1.9.1'
+        
+  EXASTRO_ITA_LANG:
+    description: Web UI Language
+    required: true
+    default: 'ja'
+
+  DISTRO_SYMBOL:
+    description: Base image symbol
+    required: true
+    default: 'ubi8'
+
+  # Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.9.1.tar.gz
+  EXASTRO_ITA_INSTALLER_URL:
+    description: Installer URL
+    required: false
+
+  # Example: it-automation-1.9.1
+  EXASTRO_ITA_UNPACK_DIR_NAME:
+    description: Installer unpack dir name
+    required: false
 
 runs:
   using: "composite"
@@ -13,5 +37,4 @@ runs:
     - name: Echo shape and color
       shell: bash
       run: |
-        echo "shape=${{ inputs.SHAPE }}, color=${{ inputs.COLOR }}" | tee output.txt
-        echo "job=${{ github.job }}"
+        echo "image-name=${{ inputs.EXASTRO_ITA_IMAGE_NAME }}, ver=${{ inputs.EXASTRO_ITA_VER }}, lang=${{ inputs.EXASTRO_ITA_LANG }}, distro=${{ inputs.DISTRO_SYMBOL }}"
