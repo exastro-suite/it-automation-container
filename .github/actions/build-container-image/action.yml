@@ -38,3 +38,43 @@ runs:
       shell: bash
       run: |
         echo "image-name=${{ inputs.EXASTRO_ITA_IMAGE_NAME }}, ver=${{ inputs.EXASTRO_ITA_VER }}, lang=${{ inputs.EXASTRO_ITA_LANG }}, distro=${{ inputs.DISTRO_SYMBOL }}"
+
+    - name: Set environment variables
+      run: |
+        function set_github_env() {
+          if [ -n "$2" ]; then
+            echo "$1=$2" >> $GITHUB_ENV
+          fi
+        }
+        set_github_env "BUILD_TARGET_DIR" "${{ inputs.EXASTRO_ITA_VER }}/${{ inputs.EXASTRO_ITA_IMAGE_NAME }}/${{ inputs.DISTRO_SYMBOL }}"
+        set_github_env "EXASTRO_ITA_LANG" "${{ inputs.EXASTRO_ITA_LANG }}"
+        set_github_env "EXASTRO_ITA_INSTALLER_URL" "${{ inputs.EXASTRO_ITA_INSTALLER_URL }}"
+        set_github_env "EXASTRO_ITA_UNPACK_DIR_NAME" "${{ inputs.EXASTRO_ITA_UNPACK_DIR_NAME }}"
+        set_github_env "IMAGE_HOST_AND_PATH" "ghcr.io/${{ github.repository_owner }}/"
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Build container image
+      run: |
+        cd $BUILD_TARGET_DIR
+        make build
+
+#    - name: Push container image
+#      run: |
+#        cd $BUILD_TARGET_DIR
+#        echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
+#        make push
+#
+#    - name: Collect evidence
+#      if: ${{ always() }}
+#      run: |
+#        cd $BUILD_TARGET_DIR
+#        make evidence
+#
+#    - name: Upload evidence
+#      if: ${{ always() }}
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: evidence-${{ matrix.IMAGE_NAME }}-${{ matrix.EXASTRO_ITA_LANG }}-${{ matrix.DISTRO_SYMBOL }}
+#        path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/
