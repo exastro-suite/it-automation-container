@@ -32,11 +32,28 @@ on:
         description: Installer unpack dir name
         required: false
 jobs:
-  build:
+  set-image-names-single-type:
+    runs-on: ubuntu-latest
+    outputs:
+      image-names: ${{ steps.set-image-names.outputs.image-names }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set image names
+        id: set-image-names
+        run: |
+          IMAGE_NAMES=$(cat ${{ github.event.inputs.EXASTRO_ITA_VER }}/image-names-single-type.txt | jq -nRc '[inputs | select(length>0)]')
+          echo "IMAGE_NAMES=${IMAGE_NAMES}"
+          echo "::set-output name=image-names::${IMAGE_NAMES}"
+
+  build-single-type:
     name: Build
     runs-on: ubuntu-latest
+    needs: set-image-names-single-type
     strategy:
       matrix:
+        EXASTRO_ITA_IMAGE_NAME: ${{ fromJson(needs.set-image-names-single-type.outputs.image-names) }}
         EXASTRO_ITA_LANG: ${{ fromJSON(github.event.inputs.EXASTRO_ITA_LANGS) }}
         DISTRO_SYMBOL: ${{ fromJSON(github.event.inputs.DISTRO_SYMBOLS) }}
     steps:
