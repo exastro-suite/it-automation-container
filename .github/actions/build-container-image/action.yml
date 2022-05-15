@@ -68,12 +68,12 @@ runs:
         echo "${{ inputs.GITHUB_PAT }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
         make push
 
-    - name: Collect evidence
-      if: ${{ always() }}
-      shell: bash
-      run: |
-        cd $BUILD_TARGET_DIR
-        make evidence
+#    - name: Collect evidence
+#      if: ${{ always() }}
+#      shell: bash
+#      run: |
+#        cd $BUILD_TARGET_DIR
+#        make evidence
 
 #    - name: Upload evidence
 #      if: ${{ always() }}
