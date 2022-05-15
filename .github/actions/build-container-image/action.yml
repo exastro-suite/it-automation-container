@@ -61,23 +61,23 @@ runs:
         cd $BUILD_TARGET_DIR
         make build
 
-#    - name: Push container image
-#      shell: bash
-#      run: |
-#        cd $BUILD_TARGET_DIR
-#        echo "${{ inputs.GITHUB_PAT }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
-#        make push
+    - name: Push container image
+      shell: bash
+      run: |
+        cd $BUILD_TARGET_DIR
+        echo "${{ inputs.GITHUB_PAT }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
+        make push
 
-#    - name: Collect evidence
-#      if: ${{ always() }}
-#      shell: bash
-#      run: |
-#        cd $BUILD_TARGET_DIR
-#        make evidence
+    - name: Collect evidence
+      if: ${{ always() }}
+      shell: bash
+      run: |
+        cd $BUILD_TARGET_DIR
+        make evidence
 
-#    - name: Upload evidence
-#      if: ${{ always() }}
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: evidence-${{ matrix.IMAGE_NAME }}-${{ matrix.EXASTRO_ITA_LANG }}-${{ matrix.DISTRO_SYMBOL }}
-#        path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/
+    - name: Upload evidence
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: evidence-${{ matrix.IMAGE_NAME }}-${{ matrix.EXASTRO_ITA_LANG }}-${{ matrix.DISTRO_SYMBOL }}
+        path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/
