@@ -34,12 +34,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Echo shape and color
-      shell: bash
-      run: |
-        echo "image-name=${{ inputs.EXASTRO_ITA_IMAGE_NAME }}, ver=${{ inputs.EXASTRO_ITA_VER }}, lang=${{ inputs.EXASTRO_ITA_LANG }}, distro=${{ inputs.DISTRO_SYMBOL }}"
-
     - name: Set environment variables
+      shell: bash
       run: |
         function set_github_env() {
           if [ -n "$2" ]; then
@@ -56,11 +52,13 @@ runs:
       uses: actions/checkout@v3
 
     - name: Build container image
+      shell: bash
       run: |
         cd $BUILD_TARGET_DIR
         make build
 
 #    - name: Push container image
+#      shell: bash
 #      run: |
 #        cd $BUILD_TARGET_DIR
 #        echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
@@ -68,6 +66,7 @@ runs:
 #
 #    - name: Collect evidence
 #      if: ${{ always() }}
+#      shell: bash
 #      run: |
 #        cd $BUILD_TARGET_DIR
 #        make evidence
