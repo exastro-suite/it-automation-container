@@ -33,6 +33,7 @@ on:
         required: false
 jobs:
   set-image-names-single-type:
+    name: Set image names for single type
     runs-on: ubuntu-latest
     outputs:
       image-names: ${{ steps.set-image-names.outputs.image-names }}
@@ -48,7 +49,7 @@ jobs:
           echo "::set-output name=image-names::${IMAGE_NAMES}"
 
   build-single-type:
-    name: Build
+    name: Build single type
     runs-on: ubuntu-latest
     needs: set-image-names-single-type
     strategy:
@@ -63,6 +64,7 @@ jobs:
       - name: Build container image
         uses: ./.github/actions/build-container-image
         with:
+          GITHUB_PAT: "${{ secrets.GITHUB_TOKEN }}"
           EXASTRO_ITA_IMAGE_NAME: it-automation
           EXASTRO_ITA_VER: ${{ github.event.inputs.EXASTRO_ITA_VER }}
           EXASTRO_ITA_LANG: ${{ matrix.EXASTRO_ITA_LANG }}
@@ -71,6 +73,7 @@ jobs:
           EXASTRO_ITA_UNPACK_DIR_NAME: ${{ github.event.inputs.EXASTRO_ITA_UNPACK_DIR_NAME }}
 
   set-image-names-multi-type:
+    name: Set image names for multi type
     runs-on: ubuntu-latest
     outputs:
       image-names: ${{ steps.set-image-names.outputs.image-names }}
@@ -86,7 +89,7 @@ jobs:
           echo "::set-output name=image-names::${IMAGE_NAMES}"
 
   build-multi-type:
-    name: Build
+    name: Build multi type
     runs-on: ubuntu-latest
     needs:
       - set-image-names-multi-type
@@ -103,6 +106,7 @@ jobs:
       - name: Build container image
         uses: ./.github/actions/build-container-image
         with:
+          GITHUB_PAT: "${{ secrets.GITHUB_TOKEN }}"
           EXASTRO_ITA_IMAGE_NAME: it-automation
           EXASTRO_ITA_VER: ${{ github.event.inputs.EXASTRO_ITA_VER }}
           EXASTRO_ITA_LANG: ${{ matrix.EXASTRO_ITA_LANG }}
