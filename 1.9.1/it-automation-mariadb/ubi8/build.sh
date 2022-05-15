@@ -120,7 +120,16 @@ dnf install -y --enablerepo=appstream telnet
 ##############################################################################
 # install ansible related packages
 
-dnf install -y --enablerepo=epel sshpass
+# WORKAROUND
+#   sshpass was removed from EPEL repository on May 2022.
+#     https://bugzilla.redhat.com/show_bug.cgi?id=2020679
+#     https://src.fedoraproject.org/rpms/sshpass/c/f185e1ffab660fbbbf866dcc833b9a918e202d09?branch=epel8
+#
+#   sshpass has been added from RHEL 8.6, but unfortunately UBI 8 has not yet.
+#   So use sshpass provided by AlmaLinux.
+
+#dnf install -y --enablerepo=epel sshpass
+dnf install -y --enablerepo=appstream sshpass
 
 
 ##############################################################################
