@@ -61,12 +61,12 @@ runs:
         cd $BUILD_TARGET_DIR
         make build
 
-    - name: Push container image
-      shell: bash
-      run: |
-        cd $BUILD_TARGET_DIR
-        echo "${{ inputs.GITHUB_PAT }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
-        make push
+#    - name: Push container image
+#      shell: bash
+#      run: |
+#        cd $BUILD_TARGET_DIR
+#        echo "${{ inputs.GITHUB_PAT }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
+#        make push
 
 #    - name: Collect evidence
 #      if: ${{ always() }}
