@@ -1,0 +1,17 @@
+name: Echo shape and color
+
+inputs:
+  SHAPE:
+    required: true
+
+  COLOR:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Echo shape and color
+      shell: bash
+      run: |
+        echo "shape=${{ inputs.SHAPE }}, color=${{ inputs.COLOR }}" | tee output.txt
+        echo "job=${{ github.job }}"

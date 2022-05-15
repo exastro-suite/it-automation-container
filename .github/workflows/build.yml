@@ -1,0 +1,44 @@
+name: Build
+on:
+  workflow_dispatch:
+    inputs:
+      SHAPE:
+        required: true
+        default: '["circle", "rectangle"]'
+
+      COLOR:
+        required: true
+        default: '["blue", "green"]'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        SHAPE: ${{ fromJSON(github.event.inputs.SHAPE) }}
+        COLOR: ${{ fromJSON(github.event.inputs.COLOR) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build container image
+        uses: ./.github/actions/build-container-image
+        with:
+          SHAPE: ${{ matrix.SHAPE }}
+          COLOR: ${{ matrix.COLOR }}
+
+      - name: Show result
+        run: |
+          cat output.txt
+          echo "job=${{ github.job }}"
+
+  postprocess:
+    name: Postprocess
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Show message
+        run: |
+          echo "Completed"
+          echo "job=${{ github.job }}"
