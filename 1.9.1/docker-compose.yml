@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   it-automation-init:
-    image: it-automation-init:1.9.1-ja-ubi8
+    image: ${IMAGE_HOST_AND_PATH}it-automation-init:1.9.1-ja-ubi8
     privileged: true
     environment:
       EXASTRO_AUTO_FILE_VOLUME_INIT: true
@@ -12,7 +12,7 @@ services:
 
 
   it-automation-mariadb:
-    image: it-automation-mariadb:1.9.1-ja-ubi8
+    image: ${IMAGE_HOST_AND_PATH}it-automation-mariadb:1.9.1-ja-ubi8
     privileged: true
     volumes:
       - exastro-database-volume:/exastro-database-volume
@@ -23,7 +23,7 @@ services:
 
 
   it-automation-webapp:
-    image: it-automation-webapp:1.9.1-ja-ubi8
+    image: ${IMAGE_HOST_AND_PATH}it-automation-webapp:1.9.1-ja-ubi8
     privileged: true
     extra_hosts:
       - "exastro-it-automation:127.0.0.1"
@@ -42,7 +42,7 @@ services:
 
 
   it-automation-backyard:
-    image: it-automation-backyard:1.9.1-ja-ubi8
+    image: ${IMAGE_HOST_AND_PATH}it-automation-backyard:1.9.1-ja-ubi8
     privileged: true
     environment:
       EXASTRO_ITA_DB_SERVICE_NAME: it-automation-mariadb
@@ -56,7 +56,7 @@ services:
 
 
   it-automation-ansible:
-    image: it-automation-ansible:1.9.1-ja-ubi8
+    image: ${IMAGE_HOST_AND_PATH}it-automation-ansible:1.9.1-ja-ubi8
     privileged: true
     volumes:
       - exastro-file-volume:/exastro-file-volume

@@ -1,6 +1,0 @@
-it-automation
-it-automation-ansible
-it-automation-backyard
-it-automation-init
-it-automation-mariadb
-it-automation-webapp
