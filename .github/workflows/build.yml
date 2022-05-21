@@ -5,7 +5,7 @@ on:
       EXASTRO_ITA_VER:
         description: Version number
         required: true
-        default: '1.9.1'
+        default: '1.10.0'
         
       EXASTRO_ITA_LANGS:
         description: Web UI Languages
@@ -22,12 +22,12 @@ on:
         required: true
         default: '["single, multi"]'
 
-      # Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.9.1.tar.gz
+      # Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.10.0.tar.gz
       EXASTRO_ITA_INSTALLER_URL:
         description: Installer URL
         required: false
 
-      # Example: it-automation-1.9.1
+      # Example: it-automation-1.10.0
       EXASTRO_ITA_UNPACK_DIR_NAME:
         description: Installer unpack dir name
         required: false
