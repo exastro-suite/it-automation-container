@@ -79,5 +79,5 @@ runs:
       if: ${{ always() }}
       uses: actions/upload-artifact@v3
       with:
-        name: evidence-${{ matrix.IMAGE_NAME }}-${{ matrix.EXASTRO_ITA_LANG }}-${{ matrix.DISTRO_SYMBOL }}
+        name: evidence-${{ inputs.EXASTRO_ITA_IMAGE_NAME }}-${{ inputs.EXASTRO_ITA_LANG }}-${{ inputs.DISTRO_SYMBOL }}
         path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/
