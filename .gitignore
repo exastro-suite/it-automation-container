@@ -3,3 +3,7 @@ tmp
 
 # PlantUML
 out/
+
+
+# Helm chart package
+*.tgz
