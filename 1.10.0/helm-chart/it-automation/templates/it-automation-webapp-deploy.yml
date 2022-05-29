@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-webapp
+  labels:
+    app: it-automation-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-webapp
+  template:
+    metadata:
+      labels:
+        app: it-automation-webapp
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "exastro-it-automation"
+      containers:
+        - name: it-automation-webapp
+          image: {{ .Values.imageRegistry }}it-automation-webapp:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+          envFrom:
+            - configMapRef:
+                name: it-automation-cm
+            - prefix:
+              secretRef:
+                name: it-automation-secret
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc

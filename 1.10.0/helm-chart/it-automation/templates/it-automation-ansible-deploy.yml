@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-ansible
+  labels:
+    app: it-automation-ansible
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-ansible
+  template:
+    metadata:
+      labels:
+        app: it-automation-ansible
+    spec:
+      containers:
+        - name: it-automation-ansible
+          image: {{ .Values.imageRegistry }}it-automation-ansible:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc

@@ -1,0 +1,197 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: it-automation-cm
+data:
+  EXASTRO_ITA_DB_SERVICE_NAME: it-automation-mariadb
+  EXASTRO_ITA_DB_USERNAME: ita_db_user
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: it-automation-secret
+type: Opaque
+data:
+  EXASTRO_ITA_DB_PASSWORD: aXRhX2RiX3Bhc3N3b3Jk
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: it-automation-mariadb
+spec:
+  type: ClusterIP
+  selector:
+    app: it-automation-mariadb
+  ports:
+    - port: 3306
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: it-automation-webapp
+spec:
+  type: NodePort
+  selector:
+    app: it-automation-webapp
+  ports:
+    - port: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: it-automation-ansible
+spec:
+  type: ClusterIP
+  selector:
+    app: it-automation-ansible
+  ports:
+    - port: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-ansible
+  labels:
+    app: it-automation-ansible
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-ansible
+  template:
+    metadata:
+      labels:
+        app: it-automation-ansible
+    spec:
+      containers:
+        - name: it-automation-ansible
+          image: ghcr.io/mtakahashiif/it-automation-ansible:1.10.0-ja-ubi8
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-backyard
+  labels:
+    app: it-automation-backyard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-backyard
+  template:
+    metadata:
+      labels:
+        app: it-automation-backyard
+    spec:
+      containers:
+      - name: it-automation-backyard
+        image: ghcr.io/mtakahashiif/it-automation-backyard:1.10.0-ja-ubi8
+        envFrom:
+          - configMapRef:
+              name: it-automation-cm
+          - prefix:
+            secretRef:
+              name: it-automation-secret
+        ports:
+          - containerPort: 80
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: exastro-file-volume
+            mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-mariadb
+  labels:
+    app: it-automation-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-mariadb
+  template:
+    metadata:
+      labels:
+        app: it-automation-mariadb
+    spec:
+      containers:
+        - name: it-automation-mariadb
+          image: ghcr.io/mtakahashiif/it-automation-mariadb:1.10.0-ja-ubi8
+          ports:
+            - containerPort: 3306
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-database-volume
+              mountPath: /exastro-database-volume
+      volumes:
+        - name: exastro-database-volume
+          persistentVolumeClaim:
+            claimName: exastro-database-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-webapp
+  labels:
+    app: it-automation-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-webapp
+  template:
+    metadata:
+      labels:
+        app: it-automation-webapp
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "exastro-it-automation"
+      containers:
+        - name: it-automation-webapp
+          image: ghcr.io/mtakahashiif/it-automation-webapp:1.10.0-ja-ubi8
+          envFrom:
+            - configMapRef:
+                name: it-automation-cm
+            - prefix:
+              secretRef:
+                name: it-automation-secret
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc

@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: it-automation-init
+  labels:
+    app: it-automation-init
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "30"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        app: it-automation-init
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: it-automation-init
+          image: {{ .Values.imageRegistry }}it-automation-init:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+          env:
+            - name: EXASTRO_AUTO_FILE_VOLUME_INIT
+              value: "true"
+            - name: EXASTRO_AUTO_DATABASE_VOLUME_INIT
+              value: "true"
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+            - name: exastro-database-volume
+              mountPath: /exastro-database-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc
+        - name: exastro-database-volume
+          persistentVolumeClaim:
+            claimName: exastro-database-pvc

@@ -1,0 +1,5 @@
+instanceName: default
+imageRegistry: ghcr.io/exastro-suite/
+
+language: ja
+distro: ubi8

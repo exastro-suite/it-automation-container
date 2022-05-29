@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: it-automation-mariadb
+spec:
+  type: ClusterIP
+  selector:
+    app: it-automation-mariadb
+  ports:
+    - port: 3306

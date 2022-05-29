@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: it-automation-cm
+data:
+  EXASTRO_ITA_DB_SERVICE_NAME: it-automation-mariadb
+  EXASTRO_ITA_DB_USERNAME: ita_db_user

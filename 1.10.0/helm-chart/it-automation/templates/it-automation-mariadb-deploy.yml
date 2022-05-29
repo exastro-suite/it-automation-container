@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-mariadb
+  labels:
+    app: it-automation-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-mariadb
+  template:
+    metadata:
+      labels:
+        app: it-automation-mariadb
+    spec:
+      containers:
+        - name: it-automation-mariadb
+          image: {{ .Values.imageRegistry }}it-automation-mariadb:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+          ports:
+            - containerPort: 3306
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-database-volume
+              mountPath: /exastro-database-volume
+      volumes:
+        - name: exastro-database-volume
+          persistentVolumeClaim:
+            claimName: exastro-database-pvc

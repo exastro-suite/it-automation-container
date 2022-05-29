@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it-automation-backyard
+  labels:
+    app: it-automation-backyard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: it-automation-backyard
+  template:
+    metadata:
+      labels:
+        app: it-automation-backyard
+    spec:
+      containers:
+        - name: it-automation-backyard
+          image: {{ .Values.imageRegistry }}it-automation-backyard:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+          envFrom:
+            - configMapRef:
+                name: it-automation-cm
+            - secretRef:
+                name: it-automation-secret
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: exastro-file-pvc

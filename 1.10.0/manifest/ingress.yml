@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: it-automation-ingress
+spec:
+  rules:
+    - host: ita.ita
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: it-automation-webapp
+                port:
+                  number: 80
