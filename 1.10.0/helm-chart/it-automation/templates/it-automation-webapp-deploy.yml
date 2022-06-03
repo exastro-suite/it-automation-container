@@ -19,8 +19,8 @@ spec:
           hostnames:
             - "exastro-it-automation"
       containers:
-        - name: it-automation-webapp
-          image: {{ .Values.imageRegistry }}it-automation-webapp:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+        - name: {{ include "ita.webapp.containerName" . }}
+          image: {{ include "ita.webapp.image" . }}
           envFrom:
             - configMapRef:
                 name: it-automation-cm

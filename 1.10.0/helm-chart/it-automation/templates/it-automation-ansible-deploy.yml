@@ -15,8 +15,8 @@ spec:
         app: it-automation-ansible
     spec:
       containers:
-        - name: it-automation-ansible
-          image: {{ .Values.imageRegistry }}it-automation-ansible:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+        - name: {{ include "ita.ansible.containerName" . }}
+          image: {{ include "ita.ansible.image" . }}
           ports:
             - containerPort: 80
             - containerPort: 443

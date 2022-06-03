@@ -15,8 +15,8 @@ spec:
         app: it-automation-backyard
     spec:
       containers:
-        - name: it-automation-backyard
-          image: {{ .Values.imageRegistry }}it-automation-backyard:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+        - name: {{ include "ita.backyard.containerName" . }}
+          image: {{ include "ita.backyard.image" . }}
           envFrom:
             - configMapRef:
                 name: it-automation-cm

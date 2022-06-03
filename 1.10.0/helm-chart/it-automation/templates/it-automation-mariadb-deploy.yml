@@ -15,8 +15,8 @@ spec:
         app: it-automation-mariadb
     spec:
       containers:
-        - name: it-automation-mariadb
-          image: {{ .Values.imageRegistry }}it-automation-mariadb:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+        - name: {{ include "ita.mariadb.containerName" . }}
+          image: {{ include "ita.mariadb.image" . }}
           ports:
             - containerPort: 3306
           securityContext:

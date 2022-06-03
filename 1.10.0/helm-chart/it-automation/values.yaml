@@ -1,5 +1,6 @@
-instanceName: default
-imageRegistry: ghcr.io/exastro-suite/
+imageRepoPrefix: ghcr.io/exastro-suite/
 
-language: ja
-distro: ubi8
+ita:
+  version: 1.10.0
+  language: ja
+  distro: ubi8
