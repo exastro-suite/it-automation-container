@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: it-automation-backyard
+  name: {{ include "ita.backyard.deploy.name" . }}
   labels:
     app: it-automation-backyard
 spec:
@@ -15,13 +15,13 @@ spec:
         app: it-automation-backyard
     spec:
       containers:
-        - name: {{ include "ita.backyard.containerName" . }}
-          image: {{ include "ita.backyard.image" . }}
+        - name: {{ include "ita.backyard.container.name" . }}
+          image: {{ include "ita.backyard.container.image" . }}
           envFrom:
             - configMapRef:
-                name: it-automation-cm
+                name: {{ include "ita.cm.name" . }}
             - secretRef:
-                name: it-automation-secret
+                name: {{ include "ita.secret.name" . }}
           ports:
             - containerPort: 80
           securityContext:

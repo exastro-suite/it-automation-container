@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: it-automation-webapp
+  name: {{ include "ita.webapp.deploy.name" . }}
   labels:
     app: it-automation-webapp
 spec:
@@ -19,14 +19,14 @@ spec:
           hostnames:
             - "exastro-it-automation"
       containers:
-        - name: {{ include "ita.webapp.containerName" . }}
-          image: {{ include "ita.webapp.image" . }}
+        - name: {{ include "ita.webapp.container.name" . }}
+          image: {{ include "ita.webapp.container.image" . }}
           envFrom:
             - configMapRef:
-                name: it-automation-cm
+                name: {{ include "ita.cm.name" . }}
             - prefix:
               secretRef:
-                name: it-automation-secret
+                name: {{ include "ita.secret.name" . }}
           ports:
             - containerPort: 80
           securityContext:

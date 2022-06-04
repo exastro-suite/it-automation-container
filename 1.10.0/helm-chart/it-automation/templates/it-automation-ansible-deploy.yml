@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: it-automation-ansible
+  name: {{ include "ita.ansible.deploy.name" . }}
   labels:
     app: it-automation-ansible
 spec:
@@ -15,8 +15,8 @@ spec:
         app: it-automation-ansible
     spec:
       containers:
-        - name: {{ include "ita.ansible.containerName" . }}
-          image: {{ include "ita.ansible.image" . }}
+        - name: {{ include "ita.ansible.container.name" . }}
+          image: {{ include "ita.ansible.container.image" . }}
           ports:
             - containerPort: 80
             - containerPort: 443

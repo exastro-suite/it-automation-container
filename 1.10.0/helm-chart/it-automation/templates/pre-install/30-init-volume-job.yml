@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: it-automation-init
+  name: {{ include "ita.init.job.name" . }}
   labels:
     app: it-automation-init
   annotations:
@@ -16,8 +16,8 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-        - name: it-automation-init
-          image: {{ .Values.imageRegistry }}it-automation-init:1.10.0-{{ .Values.language }}-{{ .Values.distro }}
+        - name: {{ include "ita.init.container.name" . }}
+          image: {{ include "ita.init.container.image" . }}
           env:
             - name: EXASTRO_AUTO_FILE_VOLUME_INIT
               value: "true"

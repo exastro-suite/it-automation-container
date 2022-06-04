@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: it-automation-mariadb
+  name: {{ include "ita.mariadb.deploy.name" . }}
   labels:
     app: it-automation-mariadb
 spec:
@@ -15,8 +15,8 @@ spec:
         app: it-automation-mariadb
     spec:
       containers:
-        - name: {{ include "ita.mariadb.containerName" . }}
-          image: {{ include "ita.mariadb.image" . }}
+        - name: {{ include "ita.mariadb.container.name" . }}
+          image: {{ include "ita.mariadb.container.image" . }}
           ports:
             - containerPort: 3306
           securityContext:
