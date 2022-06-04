@@ -53,6 +53,15 @@ install-no-hook:
 		it-automation-$(CHART_VERSION).tgz
 
 
+.PHONY: dry-run
+dry-run:
+	helm install \
+		--debug \
+		--dry-run \
+		$(CHART_RELEASE_NAME) \
+		it-automation-$(CHART_VERSION).tgz
+
+
 .PHONY: uninstall
 uninstall:
 	helm uninstall $(CHART_RELEASE_NAME)

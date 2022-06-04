@@ -4,3 +4,6 @@ ita:
   version: 1.10.0
   language: ja
   distro: ubi8
+
+  webapp:
+    replicas: 2

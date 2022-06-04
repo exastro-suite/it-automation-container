@@ -5,7 +5,7 @@ metadata:
   labels:
     app: it-automation-webapp
 spec:
-  replicas: 1
+  replicas: {{ .Values.ita.webapp.replicas }}
   selector:
     matchLabels:
       app: it-automation-webapp

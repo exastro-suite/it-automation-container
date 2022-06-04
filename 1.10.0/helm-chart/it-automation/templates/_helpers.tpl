@@ -99,6 +99,11 @@
 ##############################################################################
 # it-automation-webapp
 
+{{- define "ita.webapp.labels" -}}
+{{- printf "%s-%s" .Release.Name "it-automation-webapp" }}
+{{- end }}
+
+
 {{- define "ita.webapp.service.name" -}}
 {{- printf "%s-%s" .Release.Name "it-automation-webapp" }}
 {{- end }}
@@ -106,6 +111,11 @@
 
 {{- define "ita.webapp.deploy.name" -}}
 {{- printf "%s-%s" .Release.Name "it-automation-webapp" }}
+{{- end }}
+
+
+{{- define "ita.webapp.replicas" -}}
+{{- printf "%d" .Values.ita.webapp.replicas }}
 {{- end }}
 
 
