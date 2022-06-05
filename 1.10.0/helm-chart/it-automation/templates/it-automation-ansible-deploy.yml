@@ -2,17 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "ita.ansible.deploy.name" . }}
-  labels:
-    app: it-automation-ansible
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: it-automation-ansible
+{{ include "ita.ansible.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: it-automation-ansible
+{{ include "ita.ansible.labels" . | indent 8 }}
     spec:
       containers:
         - name: {{ include "ita.ansible.container.name" . }}
@@ -28,4 +26,4 @@ spec:
       volumes:
         - name: exastro-file-volume
           persistentVolumeClaim:
-            claimName: exastro-file-pvc
+            claimName: {{ include "ita.pvc.file.name" . }}

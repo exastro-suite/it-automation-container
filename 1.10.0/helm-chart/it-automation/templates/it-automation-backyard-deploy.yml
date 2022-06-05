@@ -2,17 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "ita.backyard.deploy.name" . }}
-  labels:
-    app: it-automation-backyard
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: it-automation-backyard
+{{ include "ita.backyard.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: it-automation-backyard
+{{ include "ita.backyard.labels" . | indent 8 }}
     spec:
       containers:
         - name: {{ include "ita.backyard.container.name" . }}
@@ -32,4 +30,4 @@ spec:
       volumes:
         - name: exastro-file-volume
           persistentVolumeClaim:
-            claimName: exastro-file-pvc
+            claimName: {{ include "ita.pvc.file.name" . }}

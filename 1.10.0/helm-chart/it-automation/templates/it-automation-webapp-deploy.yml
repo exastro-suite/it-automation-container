@@ -2,17 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "ita.webapp.deploy.name" . }}
-  labels:
-    app: it-automation-webapp
 spec:
   replicas: {{ .Values.ita.webapp.replicas }}
   selector:
     matchLabels:
-      app: it-automation-webapp
+{{ include "ita.webapp.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: it-automation-webapp
+{{ include "ita.webapp.labels" . | indent 8 }}
     spec:
       hostAliases:
         - ip: "127.0.0.1"
@@ -37,4 +35,4 @@ spec:
       volumes:
         - name: exastro-file-volume
           persistentVolumeClaim:
-            claimName: exastro-file-pvc
+            claimName: {{ include "ita.pvc.file.name" . }}

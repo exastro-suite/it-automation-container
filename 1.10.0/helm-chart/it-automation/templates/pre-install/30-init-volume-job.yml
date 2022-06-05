@@ -2,8 +2,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "ita.init.job.name" . }}
-  labels:
-    app: it-automation-init
   annotations:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "30"
@@ -12,7 +10,7 @@ spec:
   template:
     metadata:
       labels:
-        app: it-automation-init
+{{ include "ita.init.labels" . | indent 8 }}
     spec:
       restartPolicy: Never
       containers:
@@ -31,7 +29,7 @@ spec:
       volumes:
         - name: exastro-file-volume
           persistentVolumeClaim:
-            claimName: exastro-file-pvc
+            claimName: {{ include "ita.pvc.file.name" . }}
         - name: exastro-database-volume
           persistentVolumeClaim:
-            claimName: exastro-database-pvc
+            claimName: {{ include "ita.pvc.database.name" . }}

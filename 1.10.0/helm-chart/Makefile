@@ -1,8 +1,9 @@
 ##############################################################################
 # Targets
 
-CHART_RELEASE_NAME ?= ita-prod
 CHART_VERSION ?= 1.10.0
+CHART_RELEASE_NAME ?= ita-prod
+CHART_NAMESPACE ?= default
 
 
 ##############################################################################
@@ -19,6 +20,8 @@ start:
 	minikube start \
 		--extra-config=kubelet.image-pull-progress-deadline=5m \
 		--embed-certs \
+		--driver=kvm2 \
+		--memory=8g
 
 
 .PHONY: stop
@@ -39,6 +42,8 @@ package:
 .PHONY: install
 install:
 	helm install \
+		--namespace $(CHART_NAMESPACE) \
+		--create-namespace \
 		--timeout 15m \
 		$(CHART_RELEASE_NAME) \
 		it-automation-$(CHART_VERSION).tgz
@@ -47,6 +52,8 @@ install:
 .PHONY: install-no-hook
 install-no-hook:
 	helm install \
+		--namespace $(CHART_NAMESPACE) \
+		--create-namespace \
 		--timeout 15m \
 		--no-hooks \
 		$(CHART_RELEASE_NAME) \

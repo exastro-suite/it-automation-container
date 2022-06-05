@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: it-automation-mariadb
+{{ include "ita.mariadb.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: it-automation-mariadb
+{{ include "ita.mariadb.labels" . | indent 8 }}
     spec:
       containers:
         - name: {{ include "ita.mariadb.container.name" . }}
@@ -27,4 +27,4 @@ spec:
       volumes:
         - name: exastro-database-volume
           persistentVolumeClaim:
-            claimName: exastro-database-pvc
+            claimName: {{ include "ita.pvc.database.name" . }}

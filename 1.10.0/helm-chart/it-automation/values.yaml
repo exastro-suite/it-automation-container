@@ -5,5 +5,16 @@ ita:
   language: ja
   distro: ubi8
 
+  pvc:
+    file:
+      name: null
+      storageClassName: null
+      size: 5Gi
+
+    database:
+      name: null
+      storageClassName: null
+      size: 5Gi
+
   webapp:
     replicas: 2
