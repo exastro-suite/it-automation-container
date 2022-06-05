@@ -13,7 +13,7 @@ inputs:
   EXASTRO_ITA_VER:
     description: Version number
     required: true
-    default: '1.9.1'
+    default: '1.10.0'
         
   EXASTRO_ITA_LANG:
     description: Web UI Language
@@ -30,7 +30,7 @@ inputs:
     description: Installer URL
     required: false
 
-  # Example: it-automation-1.9.1
+  # Example: it-automation-1.10.0
   EXASTRO_ITA_UNPACK_DIR_NAME:
     description: Installer unpack dir name
     required: false
