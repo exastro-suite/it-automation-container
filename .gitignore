@@ -4,6 +4,8 @@ tmp
 # PlantUML
 out/
 
+# Visual Studio Code
+.vscode/
 
 # Helm chart package
 *.tgz
