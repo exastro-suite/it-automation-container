@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ita.backyard.deploy.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+{{ include "ita.backyard.labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "ita.backyard.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: {{ include "ita.backyard.container.name" . }}
+          image: {{ include "ita.backyard.container.image" . }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "ita.cm.name" . }}
+            - secretRef:
+                name: {{ include "ita.secret.name" . }}
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: {{ include "ita.pvc.file.name" . }}
