@@ -1,0 +1,91 @@
+version: "3.9"
+services:
+  it-automation-init:
+    image: ${IMAGE_HOST_AND_PATH}it-automation-init:1.9.1-ja-ubi8
+    privileged: true
+    environment:
+      EXASTRO_AUTO_FILE_VOLUME_INIT: true
+      EXASTRO_AUTO_DATABASE_VOLUME_INIT: true
+    volumes:
+      - exastro-database-volume:/exastro-database-volume
+      - exastro-file-volume:/exastro-file-volume
+
+
+  it-automation-mariadb:
+    image: ${IMAGE_HOST_AND_PATH}it-automation-mariadb:1.9.1-ja-ubi8
+    privileged: true
+    volumes:
+      - exastro-database-volume:/exastro-database-volume
+      - exastro-file-volume:/exastro-file-volume
+    depends_on:
+      it-automation-init:
+        condition: service_completed_successfully
+
+
+  it-automation-webapp:
+    image: ${IMAGE_HOST_AND_PATH}it-automation-webapp:1.9.1-ja-ubi8
+    privileged: true
+    extra_hosts:
+      - "exastro-it-automation:127.0.0.1"
+    ports:
+      - "8080:80"
+      - "10443:443"
+    environment:
+      EXASTRO_ITA_DB_SERVICE_NAME: it-automation-mariadb
+      EXASTRO_ITA_DB_USERNAME: ita_db_user
+      EXASTRO_ITA_DB_PASSWORD: ita_db_password
+    volumes:
+      - exastro-file-volume:/exastro-file-volume
+    depends_on:
+      it-automation-init:
+        condition: service_completed_successfully
+
+
+  it-automation-backyard:
+    image: ${IMAGE_HOST_AND_PATH}it-automation-backyard:1.9.1-ja-ubi8
+    privileged: true
+    environment:
+      EXASTRO_ITA_DB_SERVICE_NAME: it-automation-mariadb
+      EXASTRO_ITA_DB_USERNAME: ita_db_user
+      EXASTRO_ITA_DB_PASSWORD: ita_db_password
+    volumes:
+      - exastro-file-volume:/exastro-file-volume
+    depends_on:
+      it-automation-init:
+        condition: service_completed_successfully
+
+
+  it-automation-ansible:
+    image: ${IMAGE_HOST_AND_PATH}it-automation-ansible:1.9.1-ja-ubi8
+    privileged: true
+    volumes:
+      - exastro-file-volume:/exastro-file-volume
+    depends_on:
+      it-automation-init:
+        condition: service_completed_successfully
+
+
+  target-server-1:
+    image: test-target-server:1.0.0
+    privileged: true
+
+
+  target-server-2:
+    image: test-target-server:1.0.0
+    privileged: true
+
+
+volumes:
+  exastro-database-volume:
+#    driver: local
+#    driver_opts:
+#      type: nfs
+#      o: nfsvers=4,addr=NFS_SERVER_HOST
+#      device: ":/PATH/TO/DATABASE/VOLUME"
+
+  exastro-file-volume:
+#    driver: local
+#    driver_opts:
+#      type: nfs
+#      o: nfsvers=4,addr=NFS_SERVER_HOST
+#      device: ":/PATH/TO/DATABASE/VOLUME"
