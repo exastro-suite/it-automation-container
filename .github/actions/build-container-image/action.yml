@@ -1,0 +1,83 @@
+name: Echo shape and color
+
+inputs:
+  GITHUB_PAT:
+    description: GitHub PAT to upload image and artifact
+    required: true
+
+  EXASTRO_ITA_IMAGE_NAME:
+    description: Image name
+    required: true
+    default: 'it-automation'
+
+  EXASTRO_ITA_VER:
+    description: Version number
+    required: true
+    default: '1.10.0'
+        
+  EXASTRO_ITA_LANG:
+    description: Web UI Language
+    required: true
+    default: 'ja'
+
+  DISTRO_SYMBOL:
+    description: Base image symbol
+    required: true
+    default: 'ubi8'
+
+  # Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.9.1.tar.gz
+  EXASTRO_ITA_INSTALLER_URL:
+    description: Installer URL
+    required: false
+
+  # Example: it-automation-1.10.0
+  EXASTRO_ITA_UNPACK_DIR_NAME:
+    description: Installer unpack dir name
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set environment variables
+      shell: bash
+      run: |
+        function set_github_env() {
+          if [ -n "$2" ]; then
+            echo "$1=$2" >> $GITHUB_ENV
+          fi
+        }
+        set_github_env "BUILD_TARGET_DIR" "${{ inputs.EXASTRO_ITA_VER }}/${{ inputs.EXASTRO_ITA_IMAGE_NAME }}/${{ inputs.DISTRO_SYMBOL }}"
+        set_github_env "EXASTRO_ITA_LANG" "${{ inputs.EXASTRO_ITA_LANG }}"
+        set_github_env "EXASTRO_ITA_INSTALLER_URL" "${{ inputs.EXASTRO_ITA_INSTALLER_URL }}"
+        set_github_env "EXASTRO_ITA_UNPACK_DIR_NAME" "${{ inputs.EXASTRO_ITA_UNPACK_DIR_NAME }}"
+        set_github_env "IMAGE_HOST_AND_PATH" "ghcr.io/${{ github.repository_owner }}/"
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Build container image
+      shell: bash
+      run: |
+        cd $BUILD_TARGET_DIR
+        make build
+
+    - name: Push container image
+      shell: bash
+      run: |
+        cd $BUILD_TARGET_DIR
+        echo "${{ inputs.GITHUB_PAT }}" | docker login --username "${{ github.actor }}" --password-stdin ghcr.io
+        make push
+
+    - name: Collect evidence
+      if: ${{ always() }}
+      shell: bash
+      run: |
+        cd $BUILD_TARGET_DIR
+        make evidence
+
+    - name: Upload evidence
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: evidence-${{ inputs.EXASTRO_ITA_IMAGE_NAME }}-${{ inputs.EXASTRO_ITA_LANG }}-${{ inputs.DISTRO_SYMBOL }}
+        path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/

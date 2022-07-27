@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ita.webapp.service.name" . }}
+spec:
+  type: NodePort
+  selector:
+{{ include "ita.webapp.labels" . | indent 4 }}
+  ports:
+    - port: 80

@@ -41,39 +41,6 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 
 
 ##############################################################################
-# Download Exastro IT Automation Installer
-
-curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
-
-
-##############################################################################
-# Create ita_answers.txt
-
-cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
-install_mode:Install_Online
-ita_directory:/exastro
-ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:CentOS8
-distro_mariadb:yes
-db_root_password:ita_root_password
-db_name:ita_db
-db_username:ita_db_user
-db_password:ita_db_password
-ita_base:yes
-material:no
-createparam:yes
-hostgroup:yes
-ansible_driver:yes
-cobbler_driver:no
-terraform_driver:yes
-cicd_for_iac:yes
-ita_domain:exastro-it-automation.local
-certificate_path:
-private_key_path:
-EOS
-
-
-##############################################################################
 # Update all installed packages
 
 dnf update -y
@@ -108,7 +75,9 @@ timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]
 
 
 ##############################################################################
-# ExcelExport JapaneseLanguage GarbledCharacters (container only)
+# Reinstall "langpacks-en" to repare the corrupted language packs that causes
+# garbled file name of exported Excel files.
+
 dnf -y install langpacks-en
 
 
@@ -126,7 +95,41 @@ dnf install -y hostname # apache ssl needs hostname command
 
 
 ##############################################################################
+# Download Exastro IT Automation Installer
+
+curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+
+
+##############################################################################
+# Create ita_answers.txt
+
+cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
+install_mode:Install_Online
+ita_directory:/exastro
+ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
+linux_os:CentOS8
+distro_mariadb:yes
+db_root_password:ita_root_password
+db_name:ita_db
+db_username:ita_db_user
+db_password:ita_db_password
+ita_base:yes
+material:no
+createparam:yes
+hostgroup:yes
+ansible_driver:yes
+cobbler_driver:no
+terraform_driver:yes
+cicd_for_iac:yes
+ita_domain:exastro-it-automation.local
+certificate_path:
+private_key_path:
+EOS
+
+
+##############################################################################
 # Python interpreter warning issue (container only)
 #   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
 
 find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
+
