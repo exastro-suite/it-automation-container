@@ -31,13 +31,10 @@ initialize_volume() {
     fi
 }
 
-
 ##############################################################################
-# Main
+# Initialize file volume
 
-echo "entry point parameters ... $@"
-
-if [ -d /exastro ]; then    # Exastro IT Automation exists
+initialize_volumes() {
     # Initialize file volume
     if [ ${EXASTRO_AUTO_FILE_VOLUME_INIT:-false} = "true" ]; then
         echo "Auto file volume initialization is enabled."
@@ -49,27 +46,10 @@ if [ -d /exastro ]; then    # Exastro IT Automation exists
         echo "Auto database volume initialization is enabled."
         initialize_volume "database"
     fi
-fi
+}
+
 
 ##############################################################################
-# Certificate
+# Main
 
-EXASTRO_ITA_DOMAIN=exastro-it-automation.local
-CERTIFICATE_FILE=${EXASTRO_ITA_DOMAIN}.crt
-PRIVATE_KEY_FILE=${EXASTRO_ITA_DOMAIN}.key
-CSR_FILE=${EXASTRO_ITA_DOMAIN}.csr
-
-if [ -e /exastro ]; then
-  cd /etc/pki/tls/certs/
-  echo "subjectAltName=DNS:${EXASTRO_ITA_DOMAIN}" > san.txt
-
-  openssl genrsa 2048 > ${PRIVATE_KEY_FILE}
-  openssl req -new -sha256 -key ${PRIVATE_KEY_FILE} -out ${CSR_FILE} -subj "/CN=${EXASTRO_ITA_DOMAIN}"
-  openssl x509 -days 3650 -req -signkey ${PRIVATE_KEY_FILE} -extfile san.txt < ${CSR_FILE} > ${CERTIFICATE_FILE}
-
-  rm -f ${CSR_FILE}
-  rm -f san.txt
-fi
-
-# Execute command
-exec "$@"
+initialize_volumes

@@ -43,7 +43,6 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 ##############################################################################
 # Update all installed packages
 
-yum install -y dnf
 dnf update -y
 
 
@@ -51,13 +50,14 @@ dnf update -y
 # dnf and repository configuration
 
 dnf install -y dnf-plugins-core
+dnf config-manager --enable powertools
 
 
 ##############################################################################
 # Set system locale
 
 if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
-    dnf install -y glibc-common
+    dnf install -y glibc-locale-source
     
     /usr/bin/localedef \
         -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
@@ -72,6 +72,13 @@ localectl set-locale "LANG=${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}
 # Set system timezone
 
 timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]}"
+
+
+##############################################################################
+# Reinstall "langpacks-en" to repare the corrupted language packs that causes
+# garbled file name of exported Excel files.
+
+dnf -y install langpacks-en
 
 
 ##############################################################################
@@ -100,7 +107,7 @@ cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_a
 install_mode:Install_Online
 ita_directory:/exastro
 ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:CentOS7
+linux_os:CentOS8
 distro_mariadb:yes
 db_root_password:ita_root_password
 db_name:ita_db

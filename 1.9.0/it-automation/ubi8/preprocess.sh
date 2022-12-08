@@ -41,39 +41,6 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 
 
 ##############################################################################
-# Download Exastro IT Automation Installer
-
-curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
-
-
-##############################################################################
-# Create ita_answers.txt
-
-cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
-install_mode:Install_Online
-ita_directory:/exastro
-ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:RHEL8
-distro_mariadb:no
-db_root_password:ita_root_password
-db_name:ita_db
-db_username:ita_db_user
-db_password:ita_db_password
-ita_base:yes
-material:no
-createparam:yes
-hostgroup:yes
-ansible_driver:yes
-cobbler_driver:no
-terraform_driver:yes
-cicd_for_iac:yes
-ita_domain:exastro-it-automation.local
-certificate_path:
-private_key_path:
-EOS
-
-
-##############################################################################
 # Update all installed packages
 
 dnf update -y
@@ -84,16 +51,16 @@ dnf update -y
 
 cat << 'EOS' > /etc/yum.repos.d/centos8.repo
 [baseos]
-name=CentOS Linux $releasever - BaseOS
-mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=BaseOS&infra=$infra
-#baseurl=http://mirror.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/
+name=AlmaLinux $releasever - BaseOS
+mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/baseos
+# baseurl=https://repo.almalinux.org/almalinux/$releasever/BaseOS/$basearch/os/
 gpgcheck=0
 enabled=0
 
 [appstream]
-name=CentOS Linux $releasever - AppStream
-mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=AppStream&infra=$infra
-#baseurl=http://mirror.centos.org/$contentdir/$releasever/AppStream/$basearch/os/
+name=AlmaLinux $releasever - AppStream
+mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/appstream
+# baseurl=https://repo.almalinux.org/almalinux/$releasever/AppStream/$basearch/os/
 gpgcheck=0
 enabled=0
 EOS
@@ -129,6 +96,13 @@ timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]
 
 
 ##############################################################################
+# Reinstall "langpacks-en" to repare the corrupted language packs that causes
+# garbled file name of exported Excel files.
+
+dnf -y --enablerepo=appstream reinstall langpacks-en
+
+
+##############################################################################
 # install common packages (installer requirements)
 
 dnf install -y diffutils procps which openssl
@@ -144,16 +118,18 @@ dnf install -y --enablerepo=appstream telnet
 
 
 ##############################################################################
-# Python interpreter warning issue (container only)
-#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
-
-find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
-
-
-##############################################################################
 # install ansible related packages
 
-dnf install -y --enablerepo=epel sshpass
+# WORKAROUND
+#   sshpass was removed from EPEL repository on May 2022.
+#     https://bugzilla.redhat.com/show_bug.cgi?id=2020679
+#     https://src.fedoraproject.org/rpms/sshpass/c/f185e1ffab660fbbbf866dcc833b9a918e202d09?branch=epel8
+#
+#   sshpass has been added from RHEL 8.6, but unfortunately UBI 8 has not yet.
+#   So use sshpass provided by AlmaLinux.
+
+#dnf install -y --enablerepo=epel sshpass
+dnf install -y --enablerepo=appstream sshpass
 
 
 ##############################################################################
@@ -164,6 +140,43 @@ dnf install -y --enablerepo=epel sshpass
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
+
+
+##############################################################################
+# Download Exastro IT Automation Installer
+
+curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+
+# Python interpreter warning issue (container only)
+#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
+find ${EXASTRO_ITA_UNPACK_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
+
+
+##############################################################################
+# Create ita_answers.txt
+
+cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_answers.txt
+install_mode:Install_Online
+ita_directory:/exastro
+ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
+linux_os:RHEL8
+distro_mariadb:no
+db_root_password:ita_root_password
+db_name:ita_db
+db_username:ita_db_user
+db_password:ita_db_password
+ita_base:yes
+material:no
+createparam:yes
+hostgroup:yes
+ansible_driver:yes
+cobbler_driver:no
+terraform_driver:yes
+cicd_for_iac:yes
+ita_domain:exastro-it-automation.local
+certificate_path:
+private_key_path:
+EOS
 
 
 ##############################################################################
