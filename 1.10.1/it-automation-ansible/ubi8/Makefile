@@ -40,7 +40,7 @@ endif
 # Preprocess
 EXASTRO_ITA_INSTALLER_URL ?= https://github.com/exastro-suite/it-automation/releases/download/v$(EXASTRO_ITA_VER)_tag/exastro-it-automation-$(EXASTRO_ITA_VER).tar.gz
 EXASTRO_ITA_UNPACK_BASE_DIR ?= /root
-EXASTRO_ITA_UNPACK_DIR_NAME ?= it-automation-$(EXASTRO_ITA_VER)
+EXASTRO_ITA_UNPACK_DIR_NAME ?= it-automation-$(EXASTRO_ITA_VER)_tag
 EXASTRO_ITA_UNPACK_DIR := $(EXASTRO_ITA_UNPACK_BASE_DIR)/$(EXASTRO_ITA_UNPACK_DIR_NAME)
 
 ##############################################################################
