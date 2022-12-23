@@ -85,9 +85,9 @@ if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
         -f `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=2` \
         -A /usr/share/locale/locale.alias \
         "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}"
-     
+        
+     dnf install -y glibc-locale-source
      echo LANG=ja_JP.UTF-8 > /etc/locale.conf
-     
      export LANG=ja_JP.UTF-8
 fi
 
