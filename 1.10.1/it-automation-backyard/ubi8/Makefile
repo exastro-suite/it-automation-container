@@ -57,7 +57,7 @@ build:
 	DOCKER_BUILDKIT=1 docker build \
 		--tag $(IMAGE_FULL_NAME) \
 		--no-cache \
-		--build-arg EXASTRO_ITA_VER=$(EXASTRO_ITA_VER) \
+		--build-arg EXASTRO_ITA_VER=$(EXASTRO_ITA_VER)_tag \
 		$(DOCKER_BUILD_OPT_SECRET) \
 		./
 
