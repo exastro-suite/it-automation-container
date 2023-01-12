@@ -64,7 +64,7 @@ build:
 	docker run \
 		--detach \
 		--privileged \
-		--env EXASTRO_ITA_VER=$(EXASTRO_ITA_VER) \
+		--env EXASTRO_ITA_VER=$(EXASTRO_ITA_VER)_tag \
 		--env EXASTRO_ITA_LANG=$(EXASTRO_ITA_LANG) \
 		--name $(BUILDER_CONTAINER_NAME) \
 		$(IMAGE_FULL_NAME)
