@@ -115,7 +115,7 @@ dnf install -y --enablerepo=baseos expect
 dnf install -y rsyslog  # for writing /var/log/messages
 dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
-
+dnf install -y wget
 
 ##############################################################################
 # install ansible related packages
