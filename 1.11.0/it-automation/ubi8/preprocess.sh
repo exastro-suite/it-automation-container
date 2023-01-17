@@ -115,7 +115,7 @@ dnf install -y --enablerepo=baseos expect
 dnf install -y rsyslog  # for writing /var/log/messages
 dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
-dnf install -y wget
+
 
 ##############################################################################
 # install ansible related packages
@@ -145,7 +145,7 @@ dnf install -y --enablerepo=appstream boost-program-options libpmem
 ##############################################################################
 # Download Exastro IT Automation Installer
 
-wget ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
+curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
 
 # Python interpreter warning issue (container only)
 #   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
