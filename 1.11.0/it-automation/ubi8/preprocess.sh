@@ -44,7 +44,6 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 # Update all installed packages
 
 dnf update -y
-dnf config-manager --add-repo https://rpm.releases.hashicorp.com/$release/hashicorp.repo
 
 ##############################################################################
 # DNF repository
