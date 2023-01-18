@@ -66,9 +66,9 @@ EOS
 
 
 ##############################################################################
-# dnf and repository configuration
+# dnf (yum) and repository configuration
 
-dnf install -y dnf-plugins-core
+dnf install -y dnf-plugins-core yum-utils   # "dnf config-manager" and "yum-config-manager"
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf config-manager --disable epel epel-modular
 
@@ -116,7 +116,6 @@ dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
 
 
-
 ##############################################################################
 # install ansible related packages
 
@@ -140,7 +139,7 @@ dnf install -y --enablerepo=appstream sshpass
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
-dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+
 
 ##############################################################################
 # Download Exastro IT Automation Installer
@@ -191,4 +190,3 @@ sed -i \
 sed -i \
     -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
-
