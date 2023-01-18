@@ -46,7 +46,7 @@ jobs:
         run: |
           IMAGE_NAMES=$(cat ${{ github.event.inputs.EXASTRO_ITA_VER }}/image-names-single-type.txt | jq -nRc '[inputs | select(length>0)]')
           echo "IMAGE_NAMES=${IMAGE_NAMES}"
-          echo "::set-output name=image-names::${IMAGE_NAMES}"
+          echo "image-names=${IMAGE_NAMES}" >> $GITHUB_OUTPUT
 
   build-single-type:
     name: Build single type
@@ -86,7 +86,7 @@ jobs:
         run: |
           IMAGE_NAMES=$(cat ${{ github.event.inputs.EXASTRO_ITA_VER }}/image-names-multi-type.txt | jq -nRc '[inputs | select(length>0)]')
           echo "IMAGE_NAMES=${IMAGE_NAMES}"
-          echo "::set-output name=image-names::${IMAGE_NAMES}"
+          echo "image-names=${IMAGE_NAMES}" >> $GITHUB_OUTPUT
 
   build-multi-type:
     name: Build multi type
