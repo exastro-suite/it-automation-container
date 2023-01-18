@@ -44,7 +44,7 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 # Update all installed packages
 
 dnf update -y
-
+dnf config-manager --add-repo https://rpm.releases.hashicorp.com/$release/hashicorp.repo
 
 ##############################################################################
 # DNF repository
@@ -72,7 +72,7 @@ EOS
 dnf install -y dnf-plugins-core
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf config-manager --disable epel epel-modular
-dnf config-manager --add-repo https://rpm.releases.hashicorp.com/$release/hashicorp.repo
+
 
 ##############################################################################
 # Set system locale
