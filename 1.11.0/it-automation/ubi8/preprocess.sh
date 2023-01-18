@@ -114,7 +114,7 @@ dnf install -y --enablerepo=baseos expect
 dnf install -y rsyslog  # for writing /var/log/messages
 dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
-dnf config-manager --add-repo https://rpm.releases.hashicorp.com/$release/hashicorp.repo
+
 
 
 ##############################################################################
@@ -140,7 +140,7 @@ dnf install -y --enablerepo=appstream sshpass
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
-
+dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
 
 ##############################################################################
 # Download Exastro IT Automation Installer
