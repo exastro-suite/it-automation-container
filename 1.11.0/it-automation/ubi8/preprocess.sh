@@ -114,6 +114,7 @@ dnf install -y --enablerepo=baseos expect
 dnf install -y rsyslog  # for writing /var/log/messages
 dnf install -y hostname # apache ssl needs hostname command
 dnf install -y --enablerepo=appstream telnet
+dnf config-manager --add-repo https://rpm.releases.hashicorp.com/$release/hashicorp.repo
 
 
 ##############################################################################
