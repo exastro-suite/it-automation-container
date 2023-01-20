@@ -79,6 +79,7 @@ dnf config-manager --disable epel epel-modular
 
 if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
     dnf install -y glibc-locale-source
+    dnf install -y glibc-gconv-extra
     
     /usr/bin/localedef \
         -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
@@ -141,9 +142,6 @@ dnf install -y --enablerepo=appstream sshpass
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
-
-dnf install -y glibc-locale-source
-
 
 ##############################################################################
 # Download Exastro IT Automation Installer
