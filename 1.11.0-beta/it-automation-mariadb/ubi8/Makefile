@@ -13,7 +13,7 @@ EXASTRO_ITA_DB_NAME ?= ita_db
 EXASTRO_ITA_DB_USERNAME ?= ita_db_user
 EXASTRO_ITA_DB_PASSWORD ?= ita_db_password
 EXASTRO_ITA_DB_ROOT_PASSWORD ?= ita_root_password
-EXASTRO_ITA_DB_SERVICE_NAME ?= mariadb-np
+EXASTRO_ITA_DB_SERVICE_NAME ?= it-automation-mariadb
 
 # Distro
 DISTRO_SYMBOL := $(shell basename $(CURDIR))
@@ -38,9 +38,9 @@ DOCKER_BUILD_OPT_SECRET := --secret id=extra-root-ca,src=$(EXASTRO_EXTRA_ROOT_CA
 endif
 
 # Preprocess
-EXASTRO_ITA_INSTALLER_URL ?= https://github.com/exastro-suite/it-automation/releases/download/v$(EXASTRO_ITA_VER)_tag/exastro-it-automation-$(EXASTRO_ITA_VER).tar.gz
+EXASTRO_ITA_INSTALLER_URL ?= https://github.com/exastro-suite/it-automation/archive/v$(EXASTRO_ITA_VER).tar.gz
 EXASTRO_ITA_UNPACK_BASE_DIR ?= /root
-EXASTRO_ITA_UNPACK_DIR_NAME ?= it-automation-$(EXASTRO_ITA_VER)_tag
+EXASTRO_ITA_UNPACK_DIR_NAME ?= it-automation-$(EXASTRO_ITA_VER)
 EXASTRO_ITA_UNPACK_DIR := $(EXASTRO_ITA_UNPACK_BASE_DIR)/$(EXASTRO_ITA_UNPACK_DIR_NAME)
 
 ##############################################################################

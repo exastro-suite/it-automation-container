@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ita.mariadb.deploy.name" . }}
+  labels:
+    app: it-automation-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+{{ include "ita.mariadb.labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "ita.mariadb.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: {{ include "ita.mariadb.container.name" . }}
+          image: {{ include "ita.mariadb.container.image" . }}
+          ports:
+            - containerPort: 3306
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-database-volume
+              mountPath: /exastro-database-volume
+      volumes:
+        - name: exastro-database-volume
+          persistentVolumeClaim:
+            claimName: {{ include "ita.pvc.database.name" . }}

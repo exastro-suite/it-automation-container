@@ -47,31 +47,10 @@ dnf update -y
 
 
 ##############################################################################
-# DNF repository
-
-cat << 'EOS' > /etc/yum.repos.d/centos8.repo
-[baseos]
-name=AlmaLinux $releasever - BaseOS
-mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/baseos
-# baseurl=https://repo.almalinux.org/almalinux/$releasever/BaseOS/$basearch/os/
-gpgcheck=0
-enabled=0
-
-[appstream]
-name=AlmaLinux $releasever - AppStream
-mirrorlist=https://mirrors.almalinux.org/mirrorlist/$releasever/appstream
-# baseurl=https://repo.almalinux.org/almalinux/$releasever/AppStream/$basearch/os/
-gpgcheck=0
-enabled=0
-EOS
-
-
-##############################################################################
 # dnf and repository configuration
 
 dnf install -y dnf-plugins-core
-dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-dnf config-manager --disable epel epel-modular
+dnf config-manager --enable powertools
 
 
 ##############################################################################
@@ -79,7 +58,6 @@ dnf config-manager --disable epel epel-modular
 
 if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
     dnf install -y glibc-locale-source
-    dnf install -y glibc-gconv-extra
     
     /usr/bin/localedef \
         -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
@@ -100,14 +78,13 @@ timedatectl set-timezone "${EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE[$EXASTRO_ITA_LANG]
 # Reinstall "langpacks-en" to repare the corrupted language packs that causes
 # garbled file name of exported Excel files.
 
-dnf -y --enablerepo=appstream reinstall langpacks-en
+dnf -y install langpacks-en
 
 
 ##############################################################################
 # install common packages (installer requirements)
 
 dnf install -y diffutils procps which openssl
-dnf install -y --enablerepo=baseos expect
 
 
 ##############################################################################
@@ -115,42 +92,12 @@ dnf install -y --enablerepo=baseos expect
 
 dnf install -y rsyslog  # for writing /var/log/messages
 dnf install -y hostname # apache ssl needs hostname command
-dnf install -y --enablerepo=appstream telnet
-
-
-##############################################################################
-# install ansible related packages
-
-# WORKAROUND
-#   sshpass was removed from EPEL repository on May 2022.
-#     https://bugzilla.redhat.com/show_bug.cgi?id=2020679
-#     https://src.fedoraproject.org/rpms/sshpass/c/f185e1ffab660fbbbf866dcc833b9a918e202d09?branch=epel8
-#
-#   sshpass has been added from RHEL 8.6, but unfortunately UBI 8 has not yet.
-#   So use sshpass provided by AlmaLinux.
-
-#dnf install -y --enablerepo=epel sshpass
-dnf install -y --enablerepo=appstream sshpass
-
-
-##############################################################################
-# install MariaDB related packages
-#   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
-#   note: MariaDB 10.6 requires libpmem
-
-dnf install -y perl-DBI libaio libsepol lsof
-dnf install -y rsync iproute # additional installation
-dnf install -y --enablerepo=appstream boost-program-options libpmem
 
 
 ##############################################################################
 # Download Exastro IT Automation Installer
 
 curl -SL ${EXASTRO_ITA_INSTALLER_URL} | tar -xzC ${EXASTRO_ITA_UNPACK_BASE_DIR}
-
-# Python interpreter warning issue (container only)
-#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
-find ${EXASTRO_ITA_UNPACK_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
 
 
 ##############################################################################
@@ -160,8 +107,8 @@ cat << EOS > ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/ita_a
 install_mode:Install_Online
 ita_directory:/exastro
 ita_language:${EXASTRO_ITA_LANG_TABLE[$EXASTRO_ITA_LANG]}
-linux_os:RHEL8
-distro_mariadb:no
+linux_os:CentOS8
+distro_mariadb:yes
 db_root_password:ita_root_password
 db_name:ita_db
 db_username:ita_db_user
@@ -181,14 +128,8 @@ EOS
 
 
 ##############################################################################
-# modify scripts (bin/ita_builder_core.sh)
-#   for DNF repository check
+# Python interpreter warning issue (container only)
+#   see https://docs.ansible.com/ansible/2.10/reference_appendices/interpreter_discovery.html
 
-sed -i \
-    -E 's/ (create_repo_check .+) >>/ echo "----- SKIP \1 -----" >>/' \
-    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
-
-sed -i \
-    -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
-    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+find ${EXASTRO_ITA_UNPACK_BASE_DIR} | grep -E "/ansible.cfg$" | xargs sed -i -E 's/^\[defaults\]$/[defaults\]\ninterpreter_python=auto_silent/'
 

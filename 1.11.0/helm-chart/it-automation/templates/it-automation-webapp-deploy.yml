@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ita.webapp.deploy.name" . }}
+spec:
+  replicas: {{ .Values.ita.webapp.replicas }}
+  selector:
+    matchLabels:
+{{ include "ita.webapp.labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "ita.webapp.labels" . | indent 8 }}
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "exastro-it-automation"
+      containers:
+        - name: {{ include "ita.webapp.container.name" . }}
+          image: {{ include "ita.webapp.container.image" . }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "ita.cm.name" . }}
+            - prefix:
+              secretRef:
+                name: {{ include "ita.secret.name" . }}
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: {{ include "ita.pvc.file.name" . }}

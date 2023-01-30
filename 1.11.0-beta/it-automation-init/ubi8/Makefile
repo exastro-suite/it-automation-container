@@ -13,7 +13,7 @@ EXASTRO_ITA_DB_NAME ?= ita_db
 EXASTRO_ITA_DB_USERNAME ?= ita_db_user
 EXASTRO_ITA_DB_PASSWORD ?= ita_db_password
 EXASTRO_ITA_DB_ROOT_PASSWORD ?= ita_root_password
-EXASTRO_ITA_DB_SERVICE_NAME ?= mariadb-np
+EXASTRO_ITA_DB_SERVICE_NAME ?= it-automation-mariadb
 
 # Distro
 DISTRO_SYMBOL := $(shell basename $(CURDIR))
@@ -37,11 +37,9 @@ ifneq ($(origin EXASTRO_EXTRA_ROOT_CA), undefined)
 DOCKER_BUILD_OPT_SECRET := --secret id=extra-root-ca,src=$(EXASTRO_EXTRA_ROOT_CA)
 endif
 
-# Preprocess
-EXASTRO_ITA_INSTALLER_URL ?= https://github.com/exastro-suite/it-automation/releases/download/v$(EXASTRO_ITA_VER)_tag/exastro-it-automation-$(EXASTRO_ITA_VER).tar.gz
-EXASTRO_ITA_UNPACK_BASE_DIR ?= /root
-EXASTRO_ITA_UNPACK_DIR_NAME ?= it-automation-$(EXASTRO_ITA_VER)_tag
-EXASTRO_ITA_UNPACK_DIR := $(EXASTRO_ITA_UNPACK_BASE_DIR)/$(EXASTRO_ITA_UNPACK_DIR_NAME)
+# Volume archive
+EXASTRO_ITA_VOLUME_ARCHIVE := $(IMAGE_HOST_AND_PATH)it-automation:$(EXASTRO_ITA_VER)-$(EXASTRO_ITA_LANG)-$(DISTRO_SYMBOL)
+
 
 ##############################################################################
 # Targets
@@ -58,45 +56,9 @@ build:
 		--tag $(IMAGE_FULL_NAME) \
 		--no-cache \
 		--build-arg EXASTRO_ITA_VER=$(EXASTRO_ITA_VER) \
+		--build-arg EXASTRO_ITA_VOLUME_ARCHIVE=$(EXASTRO_ITA_VOLUME_ARCHIVE) \
 		$(DOCKER_BUILD_OPT_SECRET) \
 		./
-
-	docker run \
-		--detach \
-		--privileged \
-		--env EXASTRO_ITA_VER=$(EXASTRO_ITA_VER) \
-		--env EXASTRO_ITA_LANG=$(EXASTRO_ITA_LANG) \
-		--name $(BUILDER_CONTAINER_NAME) \
-		$(IMAGE_FULL_NAME)
-
-	sleep 10
-
-	docker exec \
-		--tty \
-		--env HTTP_PROXY \
-		--env http_proxy \
-		--env HTTPS_PROXY \
-		--env https_proxy \
-		--env NO_PROXY \
-		--env no_proxy \
-		--env EXASTRO_ITA_INSTALLER_URL=$(EXASTRO_ITA_INSTALLER_URL) \
-		--env EXASTRO_ITA_UNPACK_BASE_DIR=$(EXASTRO_ITA_UNPACK_BASE_DIR) \
-		--env EXASTRO_ITA_UNPACK_DIR=$(EXASTRO_ITA_UNPACK_DIR) \
-		--env EXASTRO_ITA_INSTALL_DIR=$(EXASTRO_ITA_INSTALL_DIR) \
-		--env EXASTRO_ITA_DB_USERNAME=$(EXASTRO_ITA_DB_USERNAME) \
-		--env EXASTRO_ITA_DB_PASSWORD=$(EXASTRO_ITA_DB_PASSWORD) \
-		--env EXASTRO_ITA_DB_ROOT_PASSWORD=$(EXASTRO_ITA_DB_ROOT_PASSWORD) \
-		--env EXASTRO_ITA_DB_NAME=$(EXASTRO_ITA_DB_NAME) \
-		--env EXASTRO_ITA_DB_SERVICE_NAME=$(EXASTRO_ITA_DB_SERVICE_NAME) \
-		$(BUILDER_CONTAINER_NAME) \
-		/root/build.sh
-
-	docker stop \
-		$(BUILDER_CONTAINER_NAME)
-
-	docker commit \
-		$(BUILDER_CONTAINER_NAME) \
-		$(IMAGE_FULL_NAME)
 
 
 .PHONY: push
