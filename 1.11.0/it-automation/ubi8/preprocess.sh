@@ -69,7 +69,7 @@ EOS
 ##############################################################################
 # dnf and repository configuration
 
-dnf install -y dnf-plugins-core
+dnf install -y dnf-plugins-core yum-utils   # "dnf config-manager" and "yum-config-manager"
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf config-manager --disable epel epel-modular
 
