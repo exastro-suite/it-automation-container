@@ -13,7 +13,7 @@ inputs:
   EXASTRO_ITA_VER:
     description: Version number
     required: true
-    default: '1.10.0'
+    default: '1.11.1'
         
   EXASTRO_ITA_LANG:
     description: Web UI Language

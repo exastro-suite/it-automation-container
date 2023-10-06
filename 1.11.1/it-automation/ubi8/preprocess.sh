@@ -45,6 +45,7 @@ declare -A EXASTRO_ITA_SYSTEM_TIMEZONE_TABLE=(
 
 dnf update -y
 
+
 ##############################################################################
 # DNF repository
 
@@ -66,7 +67,7 @@ EOS
 
 
 ##############################################################################
-# dnf (yum) and repository configuration
+# dnf and repository configuration
 
 dnf install -y dnf-plugins-core yum-utils   # "dnf config-manager" and "yum-config-manager"
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
@@ -78,6 +79,7 @@ dnf config-manager --disable epel epel-modular
 
 if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
     dnf install -y glibc-locale-source
+    dnf install -y glibc-gconv-extra
     
     /usr/bin/localedef \
         -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
@@ -119,6 +121,15 @@ dnf install -y --enablerepo=appstream telnet
 ##############################################################################
 # install ansible related packages
 
+# WORKAROUND
+#   sshpass was removed from EPEL repository on May 2022.
+#     https://bugzilla.redhat.com/show_bug.cgi?id=2020679
+#     https://src.fedoraproject.org/rpms/sshpass/c/f185e1ffab660fbbbf866dcc833b9a918e202d09?branch=epel8
+#
+#   sshpass has been added from RHEL 8.6, but unfortunately UBI 8 has not yet.
+#   So use sshpass provided by AlmaLinux.
+
+#dnf install -y --enablerepo=epel sshpass
 dnf install -y --enablerepo=appstream sshpass
 
 
@@ -181,3 +192,4 @@ sed -i \
 sed -i \
     -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+

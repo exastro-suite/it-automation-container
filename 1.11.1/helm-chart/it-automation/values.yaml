@@ -1,0 +1,20 @@
+imageRepoPrefix: ghcr.io/exastro-suite/
+
+ita:
+  version: 1.10.0
+  language: ja
+  distro: ubi8
+
+  pvc:
+    file:
+      name: null
+      storageClassName: null
+      size: 5Gi
+
+    database:
+      name: null
+      storageClassName: null
+      size: 5Gi
+
+  webapp:
+    replicas: 2
