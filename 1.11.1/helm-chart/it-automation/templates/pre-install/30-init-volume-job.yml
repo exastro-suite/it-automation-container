@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ita.init.job.name" . }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "30"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+{{ include "ita.init.labels" . | indent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {{ include "ita.init.container.name" . }}
+          image: {{ include "ita.init.container.image" . }}
+          env:
+            - name: EXASTRO_AUTO_FILE_VOLUME_INIT
+              value: "true"
+            - name: EXASTRO_AUTO_DATABASE_VOLUME_INIT
+              value: "true"
+          volumeMounts:
+            - name: exastro-file-volume
+              mountPath: /exastro-file-volume
+            - name: exastro-database-volume
+              mountPath: /exastro-database-volume
+      volumes:
+        - name: exastro-file-volume
+          persistentVolumeClaim:
+            claimName: {{ include "ita.pvc.file.name" . }}
+        - name: exastro-database-volume
+          persistentVolumeClaim:
+            claimName: {{ include "ita.pvc.database.name" . }}

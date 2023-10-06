@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ita.mariadb.service.name" . }}
+spec:
+  type: ClusterIP
+  selector:
+{{ include "ita.mariadb.labels" . | indent 4 }}
+  ports:
+    - port: 3306
