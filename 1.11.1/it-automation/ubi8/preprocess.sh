@@ -137,7 +137,7 @@ dnf install -y --enablerepo=appstream sshpass
 # install MariaDB related packages
 #   see https://mariadb.com/ja/resources/blog/how-to-install-mariadb-on-rhel8-centos8/
 #   note: MariaDB 10.6 requires libpmem
-dnf install -y libnsl
+dnf install -y libnsl.so.1
 dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
