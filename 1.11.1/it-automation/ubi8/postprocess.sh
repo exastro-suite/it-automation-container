@@ -59,9 +59,9 @@ move_and_link_and_archive() {
 }
 
 # ansible python verup
-dnf install -y python3.12
-update-alternatives --set python /usr/bin/python3.12
-pip3.12 install --upgrade ansible
+yum install -y python39
+update-alternatives --set python /usr/bin/python3.9
+pip3.9 install --upgrade ansible
 
 # stop services
 systemctl stop httpd
