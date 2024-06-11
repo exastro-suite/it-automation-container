@@ -58,6 +58,10 @@ move_and_link_and_archive() {
     tar zcvf ${ARCHIVE_FILE_PATH} -C ${VOLUME_PATH} ./
 }
 
+# ansible python verup
+dnf install -y python3.12
+update-alternatives --set python /usr/bin/python3.12
+pip3.12 install --upgrade ansible
 
 # stop services
 systemctl stop httpd
