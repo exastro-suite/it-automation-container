@@ -53,7 +53,7 @@ runs:
         set_github_env "IMAGE_HOST_AND_PATH" "ghcr.io/${{ github.repository_owner }}/"
 
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build container image
       shell: bash
@@ -77,7 +77,7 @@ runs:
 
     - name: Upload evidence
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: evidence-${{ inputs.EXASTRO_ITA_IMAGE_NAME }}-${{ inputs.EXASTRO_ITA_LANG }}-${{ inputs.DISTRO_SYMBOL }}
         path: ${{ github.workspace }}/${{ env.BUILD_TARGET_DIR }}/tmp/

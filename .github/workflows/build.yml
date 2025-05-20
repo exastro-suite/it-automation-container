@@ -39,7 +39,7 @@ jobs:
       image-names: ${{ steps.set-image-names.outputs.image-names }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set image names
         id: set-image-names
@@ -59,7 +59,7 @@ jobs:
         DISTRO_SYMBOL: ${{ fromJSON(github.event.inputs.DISTRO_SYMBOLS) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build container image
         uses: ./.github/actions/build-container-image
@@ -79,7 +79,7 @@ jobs:
       image-names: ${{ steps.set-image-names.outputs.image-names }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set image names
         id: set-image-names
