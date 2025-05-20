@@ -66,20 +66,6 @@ enabled=0
 EOS
 
 
-cat << 'EOS' > /etc/yum.repos.d/MariaDB.repo
-# MariaDB 10.11 RedHatEnterpriseLinux repository list - created 2025-05-13 05:20 UTC
-# https://mariadb.org/download/
-[mariadb]
-name = MariaDB
-# rpm.mariadb.org is a dynamic mirror if your preferred mirror goes offline. See https://mariadb.org/mirrorbits/ for details.
-# baseurl = https://rpm.mariadb.org/10.11/rhel/$releasever/$basearch
-baseurl = https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/yum/10.11/rhel/$releasever/$basearch
-module_hotfixes = 1
-# gpgkey = https://rpm.mariadb.org/RPM-GPG-KEY-MariaDB
-gpgkey = https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/yum/RPM-GPG-KEY-MariaDB
-gpgcheck = 1
-EOS
-
 ##############################################################################
 # dnf and repository configuration
 
@@ -156,10 +142,6 @@ dnf install -y perl-DBI libaio libsepol lsof
 dnf install -y rsync iproute # additional installation
 dnf install -y --enablerepo=appstream boost-program-options libpmem
 dnf install -y --enablerepo=baseos liburing
-
-##############################################################################
-# install MariaDB
-dnf install -y MariaDB-server MariaDB-client
 
 
 ##############################################################################
