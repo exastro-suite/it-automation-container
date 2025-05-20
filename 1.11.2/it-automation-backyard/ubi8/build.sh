@@ -76,6 +76,20 @@ enabled=0
 EOS
 
 
+cat << 'EOS' > /etc/yum.repos.d/MariaDB.repo
+# MariaDB 10.11 RedHatEnterpriseLinux repository list - created 2025-05-13 05:20 UTC
+# https://mariadb.org/download/
+[mariadb]
+name = MariaDB
+# rpm.mariadb.org is a dynamic mirror if your preferred mirror goes offline. See https://mariadb.org/mirrorbits/ for details.
+# baseurl = https://rpm.mariadb.org/10.11/rhel/$releasever/$basearch
+baseurl = https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/yum/10.11/rhel/$releasever/$basearch
+module_hotfixes = 1
+# gpgkey = https://rpm.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgkey = https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/yum/RPM-GPG-KEY-MariaDB
+gpgcheck = 1
+EOS
+
 ##############################################################################
 # dnf and repository configuration
 
@@ -89,7 +103,7 @@ dnf config-manager --disable epel epel-modular
 
 if [[ ${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]} != "C."* ]]; then
     dnf install -y glibc-locale-source
-    
+
     /usr/bin/localedef \
         -i `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=1` \
         -f `echo -n "${EXASTRO_ITA_SYSTEM_LOCALE_TABLE[$EXASTRO_ITA_LANG]}" | cut --delimiter=. --fields=2` \
@@ -178,7 +192,7 @@ find ${EXASTRO_ITA_UNPACK_DIR} -type f | xargs -I{} sed -i -e "s:%%%%%ITA_DIRECT
 # MariaDBインストール
 
 # No.5 MariaDBをインストールする
-curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
+# curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf clean all
 dnf install -y MariaDB
 
