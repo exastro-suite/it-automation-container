@@ -20,7 +20,7 @@ on:
       EXASTRO_ITA_TYPES:
         description: Exastro IT Automation types
         required: true
-        default: '["single, multi"]'
+        default: '["single"]'
 
       # Example: https://github.com/exastro-suite/it-automation/archive/refs/heads/v1.11.0.tar.gz
       EXASTRO_ITA_INSTALLER_URL:
