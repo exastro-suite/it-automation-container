@@ -17,7 +17,7 @@ EXASTRO_ITA_DB_PASSWORD ?= ita_db_password
 DISTRO_SYMBOL := $(shell basename $(CURDIR))
 
 # Image
-IMAGE_NAME := $(shell basename $(shell dirname $(CURDIR)))-patched1
+IMAGE_NAME := $(shell basename $(shell dirname $(CURDIR)))
 
 ifdef USE_GITHUB_PACKAGES
 IMAGE_HOST_AND_PATH := $(shell git config remote.origin.url | sed -E "s@^https://github.com/([^/]+)/.*@ghcr.io/\1/@")
@@ -25,7 +25,7 @@ else
 IMAGE_HOST_AND_PATH ?= 
 endif
 
-IMAGE_FULL_NAME := $(IMAGE_HOST_AND_PATH)$(IMAGE_NAME):$(EXASTRO_ITA_VER)-$(EXASTRO_ITA_LANG)-$(DISTRO_SYMBOL)
+IMAGE_FULL_NAME := $(IMAGE_HOST_AND_PATH)$(IMAGE_NAME):$(EXASTRO_ITA_VER)--patched1-20261026-$(EXASTRO_ITA_LANG)-$(DISTRO_SYMBOL)
 
 # Builder container
 BUILDER_CONTAINER_NAME := $(IMAGE_NAME)-$(EXASTRO_ITA_VER)-$(EXASTRO_ITA_LANG)-$(DISTRO_SYMBOL)-builder
