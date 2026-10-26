@@ -212,10 +212,10 @@ sed -i \
     -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
-# Composer バージョンを 1.10.16 → 2.2 に置換
-sed -i 's/--version=1\.10\.16/--version=2.2/g' \
+# Composer を 1.10.16 から 2.2系(LTS)に変更
+sed -i '/curl -sS \$COMPOSER/s/--version=1\.10\.16/--2.2/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
-# Composer require $PHPSPREADSHEET に -n フラグを追加
-sed -i 's|require \$PHPSPREADSHEET|require \$PHPSPREADSHEET -n|' \
+# composer require を非対話モード(-n)で実行
+sed -i 's|composer\.phar require \$PHPSPREADSHEET >>|composer.phar require $PHPSPREADSHEET -n >>|' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
