@@ -215,4 +215,4 @@ sed -i \
 sed -i '
 s/--version=1\.10\.16/--2.2/
 /--2.2/a export COMPOSER_ALLOW_SUPERUSER=1
-' bin/ita_builder_core.sh
+' ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
