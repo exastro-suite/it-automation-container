@@ -204,7 +204,7 @@ echo "" | pecl install YAML
 mkdir -p /usr/share/php/vendor
 
 # No.12 PhpSpreadsheet(v1.8.0)をインストールする
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --2.2
 /usr/bin/composer.phar require "phpoffice/phpspreadsheet":"1.18.0"
 mv vendor /usr/share/php/
 
