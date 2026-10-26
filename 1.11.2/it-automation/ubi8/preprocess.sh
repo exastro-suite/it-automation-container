@@ -212,7 +212,10 @@ sed -i \
     -E 's/ cloud_repo_setting$/ echo "----- SKIP cloud_repo_setting -----"/' \
     ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
 
-sed -i '
-s/--version=1\.10\.16/--2.2/
-/--2.2/a export COMPOSER_ALLOW_SUPERUSER=1
-' ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+# Composer バージョンを1.10.6から2.2に置換
+sed -i '/curl -sS \$COMPOSER/s/--version=1\.10\.16/--version=2.2/' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
+
+# composer.phar require $PHPSPREADSHEET の末尾に -n を追加
+sed -i 's|/usr/bin/composer.phar require \$PHPSPREADSHEET$|/usr/bin/composer.phar require $PHPSPREADSHEET -n|' \
+    ${EXASTRO_ITA_UNPACK_DIR}/ita_install_package/install_scripts/bin/ita_builder_core.sh
